@@ -150,11 +150,56 @@ const crearNuevoPassword = async (req, res) => {
   res.status(200).json({ msg: "Contraseña actualizada correctamente" })
 }
 
+const googleLogin = async (req, res) => {
+  try {
+    const { email, nombre } = req.body;
+
+    if (!email || !nombre) {
+      return res.status(400).json({ msg: 'Datos incompletos del usuario de Google' });
+    }
+
+    let pasante = await Pasante.findOne({ email });
+
+    // Si no existe el usuario, crearlo automáticamente
+    if (!pasante) {
+      pasante = new Pasante({
+        nombre,
+        email,
+        password: 'GOOGLE_AUTH', // Puedes usar una constante dummy
+        facultad: 'Sin especificar',
+        celular: 'Sin especificar',
+        rol: 'pasante',
+        confirmEmail: true // Ya que viene verificado desde Google
+      });
+
+      await pasante.save();
+    }
+
+    // Generar JWT
+    const token = generarJWT(pasante._id);
+
+    res.status(200).json({
+      msg: 'Login con Google exitoso',
+      token,
+      pasante: {
+        id: pasante._id,
+        nombre: pasante.nombre,
+        email: pasante.email
+      }
+    });
+
+  } catch (error) {
+    console.error('Error en login con Google:', error);
+    res.status(500).json({ msg: 'Error al iniciar sesión con Google' });
+  }
+};
+
 export {
   registro,
   login,
   confirmarMail,
   recuperarPassword,
   comprobarTokenPassword,
-  crearNuevoPassword
+  crearNuevoPassword,
+  googleLogin
 }
