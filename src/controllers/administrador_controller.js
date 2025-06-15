@@ -34,13 +34,13 @@ const crearPasante = async (req, res) => {
   }
 };
 
-// Obtener todos los pasantes o buscar por nombre o email (query params)
+// Obtener todos los pasantes
 const obtenerPasantes = async (req, res) => {
   try {
     const { search } = req.query;
     let filtro = {};
     if (search) {
-      const regex = new RegExp(search, 'i'); // insensible a mayúsculas
+      const regex = new RegExp(search, 'i');
       filtro = { $or: [{ nombre: regex }, { email: regex }] };
     }
     const pasantes = await Pasante.find(filtro);
@@ -50,7 +50,7 @@ const obtenerPasantes = async (req, res) => {
   }
 };
 
-// Obtener pasante por ID
+// Obtener pasante por id
 const obtenerPasantePorId = async (req, res) => {
   try {
     const pasante = await Pasante.findById(req.params.id);
@@ -101,7 +101,7 @@ const eliminarPasante = async (req, res) => {
 
 // EXPOSICIONES
 
-// Crear exposición
+// Crear exposicion
 const crearExposicion = async (req, res) => {
   try {
     const { nombre, descripcion } = req.body;
@@ -138,7 +138,7 @@ const crearExposicion = async (req, res) => {
   }
 };
 
-// Obtener exposiciones o buscar por nombre (query param)
+// Obtener exposiciones o buscar por nombre
 const obtenerExposiciones = async (req, res) => {
   try {
     const { search } = req.query;
@@ -154,7 +154,7 @@ const obtenerExposiciones = async (req, res) => {
   }
 };
 
-// Obtener exposición por ID
+// Obtener exposición por id
 const obtenerExposicionPorId = async (req, res) => {
   try {
     const exposicion = await Exposicion.findById(req.params.id);
