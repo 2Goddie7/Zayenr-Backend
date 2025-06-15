@@ -1,12 +1,15 @@
-import moongose from "mongoose";
+import mongoose from "mongoose";
+import dotenv from 'dotenv';
 
-moongose.set("strictQuery", true);
+dotenv.config();
 
-console.log(process.env.MONGODB_URI_ATLAS);
+mongoose.set("strictQuery", true);
+
+console.log("URI: ",process.env.MONGODB_URI_ATLAS);
 
 const connection = async () => {
   try {
-    await moongose.connect(process.env.MONGODB_URI_ATLAS);
+    await mongoose.connect(process.env.MONGODB_URI_ATLAS);
     console.log("Database is connected");
   } catch (error) {
     console.log(error);
