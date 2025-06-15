@@ -7,6 +7,7 @@ import {
   comprobarTokenPassword,
   crearNuevoPassword
 } from '../controllers/pasante_controller.js'
+import { googleLogin } from '../controllers/pasante_controller.js';
 
 const router = express.Router()
 
@@ -27,5 +28,7 @@ router.get('/recuperar-password/:token', comprobarTokenPassword)//OK
 
 // Crear nueva contraseña
 router.post('/recuperar-password/:token', crearNuevoPassword)//OK
+
+router.post('/google-login', googleLogin)
 
 export default router
