@@ -194,6 +194,25 @@ const googleLogin = async (req, res) => {
   }
 };
 
+// Obtener perfil del pasante por ID
+const obtenerPerfilPasante = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const pasante = await Pasante.findById(id); // Opcional: excluye contraseña y token
+
+    if (!pasante) {
+      return res.status(404).json({ msg: "Pasante no encontrado" });
+    }
+
+    res.status(200).json(pasante);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ msg: "Error al obtener el perfil del pasante" });
+  }
+};
+
+
 export {
   registro,
   login,
@@ -201,5 +220,6 @@ export {
   recuperarPassword,
   comprobarTokenPassword,
   crearNuevoPassword,
-  googleLogin
+  googleLogin,
+  obtenerPerfilPasante
 }
