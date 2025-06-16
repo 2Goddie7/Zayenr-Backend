@@ -1,3 +1,4 @@
+import Administrador from '../models/Administrador.js';
 import Pasante from '../models/Pasante.js';
 import Exposicion from '../models/Exposicion.js';
 import { deleteFileFromCloudinary } from '../utils/cloudinary.js';
@@ -8,17 +9,25 @@ const loginAdministrador = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    if (!email || !password) return res.status(400).json({ msg: "Todos los campos son obligatorios" });
+    if (!email || !password) 
+      return res.status(400).json({ msg: "Todos los campos son obligatorios" });
 
-    const admin = await Pasante.findOne({ email });
-    if (!admin) return res.status(404).json({ msg: "El correo no está registrado" });
+    const admin = await Administrador.findOne({ email });
+    if (!admin) 
+      return res.status(404).json({ msg: "El correo no está registrado" });
 
-    if (admin.rol !== 'administrador') return res.status(403).json({ msg: "No tienes permisos de administrador" });
+    if (admin.rol !== 'administrador') 
+      return res.status(403).json({ msg: "No tienes permisos de administrador" });
 
     const passwordValida = await admin.matchPassword(password);
-    if (!passwordValida) return res.status(401).json({ msg: "Contraseña incorrecta" });
+    if (!passwordValida) 
+      return res.status(401).json({ msg: "Contraseña incorrecta" });
 
-    const token = jwt.sign({ id: admin._id }, process.env.JWT_SECRET || 'secreto', { expiresIn: '1d' });
+    const token = jwt.sign(
+      { id: admin._id },
+      process.env.JWT_SECRET || 'secreto',
+      { expiresIn: '1d' }
+    );
 
     res.status(200).json({
       msg: "Bienvenido administrador",
@@ -35,6 +44,7 @@ const loginAdministrador = async (req, res) => {
   }
 };
 
+// Cambiar contraseña administrador
 const cambiarPasswordAdministrador = async (req, res) => {
   try {
     const { id } = req.params; // ID del admin desde la URL
@@ -44,7 +54,7 @@ const cambiarPasswordAdministrador = async (req, res) => {
       return res.status(400).json({ msg: "Todos los campos son obligatorios" });
     }
 
-    const admin = await Pasante.findById(id);
+    const admin = await Administrador.findById(id);
     if (!admin) return res.status(404).json({ msg: "Administrador no encontrado" });
 
     if (admin.rol !== 'administrador') {
@@ -64,7 +74,6 @@ const cambiarPasswordAdministrador = async (req, res) => {
     res.status(500).json({ msg: "Error al cambiar la contraseña", error: error.message });
   }
 };
-
 
 // PASANTES
 
