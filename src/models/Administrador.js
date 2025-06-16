@@ -35,7 +35,8 @@ const administradorSchema = new Schema({
     default: true
   }
 }, {
-  timestamps: true
+  timestamps: true,
+  collection: 'administrador'
 });
 
 // Cifrar la contraseña
