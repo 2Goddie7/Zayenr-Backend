@@ -1,6 +1,8 @@
 import express from 'express';
 import upload from '../middleware/upload.js'; // para manejo de archivos en exposiciones
 import {
+  loginAdministrador,
+  cambiarPasswordAdministrador,
   crearPasante,
   obtenerPasantes,
   obtenerPasantePorId,
@@ -11,14 +13,20 @@ import {
   obtenerExposicionPorId,
   actualizarExposicion,
   eliminarExposicion
-} from '../controllers/admin_controller.js';
+} from '../controllers/administrador_controller.js';
 
 const router = express.Router();
 
+// Login administrador
+router.post('/login', loginAdministrador);
+// Cambiar contraseña
+router.put('/cambiar-password/:id', cambiarPasswordAdministrador);
+
+
 // Rutas PASANTES
 router.post('/pasantes', crearPasante); // Crear pasante
-router.get('/pasantes', obtenerPasantes); // Listar o buscar pasantes (?search=)
-router.get('/pasantes/:id', obtenerPasantePorId); // Obtener pasante por ID
+router.get('/pasantes', obtenerPasantes); // Listar o buscar pasantes
+router.get('/pasantes/:id', obtenerPasantePorId); // Obtener pasante porid
 router.put('/pasantes/:id', actualizarPasante); // Actualizar pasante
 router.delete('/pasantes/:id', eliminarPasante); // Eliminar pasante
 
