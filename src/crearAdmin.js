@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import Administrador from './models/Administrador.js'; // Asegúrate de que la ruta es correcta
+import Administrador from './models/Administrador.js'; 
 
 async function crearAdministrador() {
   try {

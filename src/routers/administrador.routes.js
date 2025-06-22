@@ -14,44 +14,37 @@ import {
   actualizarExposicion,
   eliminarExposicion
 } from '../controllers/administrador_controller.js';
+import { verificarTokenJWT } from '../middleware/JWT.js';
 
 const router = express.Router();
 
 // Login administrador
 router.post('/login', loginAdministrador);
 // Cambiar contraseña
-router.put('/cambiar-password/:id', cambiarPasswordAdministrador);
+router.put('/cambiar-password', verificarTokenJWT, cambiarPasswordAdministrador);
 
 
 // Rutas PASANTES
-router.post('/pasantes', crearPasante); // Crear pasante
-router.get('/pasantes', obtenerPasantes); // Listar o buscar pasantes
-router.get('/pasantes/:id', obtenerPasantePorId); // Obtener pasante porid
-router.put('/pasantes/:id', actualizarPasante); // Actualizar pasante
-router.delete('/pasantes/:id', eliminarPasante); // Eliminar pasante
+router.post('/pasantes', verificarTokenJWT, crearPasante);
+router.get('/pasantes', verificarTokenJWT, obtenerPasantes);
+router.get('/pasantes/:id', verificarTokenJWT, obtenerPasantePorId);
+router.put('/pasantes/:id', verificarTokenJWT, actualizarPasante);
+router.delete('/pasantes/:id', verificarTokenJWT, eliminarPasante);
 
 // Rutas EXPOSICIONES
-router.post(
-  '/exposiciones',
-  upload.fields([
-    { name: 'imagen', maxCount: 1 },
-    { name: 'audio', maxCount: 1 }
-  ]),
+router.post('/exposiciones',
+  verificarTokenJWT,
+  upload.fields([{ name: 'imagen', maxCount: 1 }, { name: 'audio', maxCount: 1 }]),
   crearExposicion
 ); // Crear exposición con archivos
 
-router.get('/exposiciones', obtenerExposiciones); // Listar o buscar exposiciones (?search=)
-router.get('/exposiciones/:id', obtenerExposicionPorId); // Obtener exposición por ID
-
-router.put(
-  '/exposiciones/:id',
-  upload.fields([
-    { name: 'imagen', maxCount: 1 },
-    { name: 'audio', maxCount: 1 }
-  ]),
+router.get('/exposiciones', verificarTokenJWT, obtenerExposiciones);
+router.get('/exposiciones/:id', verificarTokenJWT, obtenerExposicionPorId);
+router.put('/exposiciones/:id',
+  verificarTokenJWT,
+  upload.fields([{ name: 'imagen', maxCount: 1 }, { name: 'audio', maxCount: 1 }]),
   actualizarExposicion
-); // Actualizar exposición (puede incluir nuevos archivos)
-
-router.delete('/exposiciones/:id', eliminarExposicion); // Eliminar exposición
+);
+router.delete('/exposiciones/:id', verificarTokenJWT, eliminarExposicion);
 
 export default router;
