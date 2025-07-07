@@ -11,7 +11,7 @@ async function crearAdministrador() {
       email: 'diego.mullo@epn.edu.ec',
       rol: 'administrador'
     });
-
+  
     // Cifra la contraseña usando el método del esquema
     admin.password = await admin.encrypPassword('12345');
 
