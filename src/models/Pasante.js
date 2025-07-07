@@ -43,7 +43,12 @@ const pasanteSchema = new Schema({
     status: {
         type: Boolean,
         default: true
-    }
+    },
+    fotoPerfil: {
+        type: String,
+        allowNull: true
+}
+
 }, {
     timestamps: true
 });

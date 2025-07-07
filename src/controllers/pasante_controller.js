@@ -2,6 +2,33 @@ import Pasante from '../models/Pasante.js'
 import { sendMailToRegister, sendMailToRecoveryPassword } from "../config/nodemailer.js"
 import generarJWT from '../helpers/crearJWT.js'
 
+//Actualizar foto pasante
+const actualizarPerfilPasante = async (req, res) => {
+  const { id } = req.params;
+  const { nombre, email, facultad, celular, fotoPerfil } = req.body;
+
+  try {
+    const pasante = await Pasante.findById(id);
+    if (!pasante) {
+      return res.status(404).json({ msg: "Pasante no encontrado" });
+    }
+
+    pasante.nombre = nombre ?? pasante.nombre;
+    pasante.email = email ?? pasante.email;
+    pasante.facultad = facultad ?? pasante.facultad;
+    pasante.celular = celular ?? pasante.celular;
+    pasante.fotoPerfil = fotoPerfil ?? pasante.fotoPerfil;
+
+    await pasante.save();
+
+    res.status(200).json({ msg: "Perfil actualizado correctamente", pasante });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ msg: "Error al actualizar el perfil" });
+  }
+};
+
+
 // Registro de pasante
 const registro = async (req, res) => {
   try {
@@ -221,5 +248,6 @@ export {
   comprobarTokenPassword,
   crearNuevoPassword,
   googleLogin,
-  obtenerPerfilPasante
+  obtenerPerfilPasante,
+  actualizarPerfilPasante
 }
