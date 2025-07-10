@@ -75,6 +75,17 @@ const cambiarPasswordAdministrador = async (req, res) => {
   }
 };
 
+const obtenerPerfilAdministrador = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const admin = await Administrador.findById(id);
+    if (!admin) return res.status(404).json({ msg: "Administrador no encontrado" });
+    res.status(200).json(admin);
+  } catch (error) {
+    res.status(500).json({ msg: "Error al obtener perfil de administrador" });
+  }
+};
+
 // PASANTES
 
 // Crear pasante
@@ -297,6 +308,7 @@ const eliminarExposicion = async (req, res) => {
 export {
   loginAdministrador,
   cambiarPasswordAdministrador,
+  obtenerPerfilAdministrador,
   // Pasantes
   crearPasante,
   obtenerPasantes,

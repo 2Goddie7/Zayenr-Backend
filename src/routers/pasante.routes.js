@@ -6,7 +6,8 @@ import {
   recuperarPassword,
   comprobarTokenPassword,
   crearNuevoPassword,
-  obtenerPerfilPasante
+  obtenerPerfilPasante,
+  actualizarPerfilPasante
 } from '../controllers/pasante_controller.js'
 import { googleLogin } from '../controllers/pasante_controller.js';
 
@@ -33,5 +34,7 @@ router.post('/recuperar-password/:token', crearNuevoPassword)//OK
 router.post('/google-login', googleLogin)
 
 router.get('/perfil/:id', obtenerPerfilPasante)//OK
+
+router.put('/perfil/:id', actualizarPerfilPasante)
 
 export default router
