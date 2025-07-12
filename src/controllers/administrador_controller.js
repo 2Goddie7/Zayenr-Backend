@@ -1,32 +1,34 @@
-import Administrador from '../models/Administrador.js';
-import Pasante from '../models/Pasante.js';
-import Exposicion from '../models/Exposicion.js';
-import { deleteFileFromCloudinary } from '../utils/cloudinary.js';
-import jwt from 'jsonwebtoken';
+import Administrador from "../models/Administrador.js";
+import Pasante from "../models/Pasante.js";
+import Exposicion from "../models/Exposicion.js";
+import { deleteFileFromCloudinary } from "../utils/cloudinary.js";
+import jwt from "jsonwebtoken";
 
 // Login administrador
 const loginAdministrador = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    if (!email || !password) 
+    if (!email || !password)
       return res.status(400).json({ msg: "Todos los campos son obligatorios" });
 
     const admin = await Administrador.findOne({ email });
-    if (!admin) 
+    if (!admin)
       return res.status(404).json({ msg: "El correo no está registrado" });
 
-    if (admin.rol !== 'administrador') 
-      return res.status(403).json({ msg: "No tienes permisos de administrador" });
+    if (admin.rol !== "administrador")
+      return res
+        .status(403)
+        .json({ msg: "No tienes permisos de administrador" });
 
     const passwordValida = await admin.matchPassword(password);
-    if (!passwordValida) 
+    if (!passwordValida)
       return res.status(401).json({ msg: "Contraseña incorrecta" });
 
     const token = jwt.sign(
-      { id: admin._id },
-      process.env.JWT_SECRET || 'secreto',
-      { expiresIn: '1d' }
+      { id: admin._id, rol: admin.rol }, // ✅ AGREGA EL ROL
+      process.env.JWT_SECRET || "secreto",
+      { expiresIn: "1d" }
     );
 
     res.status(200).json({
@@ -36,11 +38,13 @@ const loginAdministrador = async (req, res) => {
         id: admin._id,
         nombre: admin.nombre,
         email: admin.email,
-        rol: admin.rol
-      }
+        rol: admin.rol,
+      },
     });
   } catch (error) {
-    res.status(500).json({ msg: "Error al iniciar sesión", error: error.message });
+    res
+      .status(500)
+      .json({ msg: "Error al iniciar sesión", error: error.message });
   }
 };
 
@@ -55,15 +59,18 @@ const cambiarPasswordAdministrador = async (req, res) => {
     }
 
     const admin = await Administrador.findById(id);
-    if (!admin) return res.status(404).json({ msg: "Administrador no encontrado" });
+    if (!admin)
+      return res.status(404).json({ msg: "Administrador no encontrado" });
 
-    if (admin.rol !== 'administrador') {
+    if (admin.rol !== "administrador") {
       return res.status(403).json({ msg: "No autorizado" });
     }
 
     const passwordValida = await admin.matchPassword(actualPassword);
     if (!passwordValida) {
-      return res.status(401).json({ msg: "La contraseña actual es incorrecta" });
+      return res
+        .status(401)
+        .json({ msg: "La contraseña actual es incorrecta" });
     }
 
     admin.password = await admin.encrypPassword(nuevaPassword);
@@ -71,7 +78,9 @@ const cambiarPasswordAdministrador = async (req, res) => {
 
     res.status(200).json({ msg: "Contraseña actualizada correctamente" });
   } catch (error) {
-    res.status(500).json({ msg: "Error al cambiar la contraseña", error: error.message });
+    res
+      .status(500)
+      .json({ msg: "Error al cambiar la contraseña", error: error.message });
   }
 };
 
@@ -79,7 +88,8 @@ const obtenerPerfilAdministrador = async (req, res) => {
   try {
     const { id } = req.params;
     const admin = await Administrador.findById(id);
-    if (!admin) return res.status(404).json({ msg: "Administrador no encontrado" });
+    if (!admin)
+      return res.status(404).json({ msg: "Administrador no encontrado" });
     res.status(200).json(admin);
   } catch (error) {
     res.status(500).json({ msg: "Error al obtener perfil de administrador" });
@@ -108,13 +118,17 @@ const crearPasante = async (req, res) => {
       password: await Pasante.prototype.encrypPassword(password),
       facultad,
       celular,
-      rol: rol || 'pasante'
+      rol: rol || "pasante",
     });
 
     await nuevoPasante.save();
-    res.status(201).json({ msg: "Pasante creado correctamente", pasante: nuevoPasante });
+    res
+      .status(201)
+      .json({ msg: "Pasante creado correctamente", pasante: nuevoPasante });
   } catch (error) {
-    res.status(500).json({ msg: "Error al crear pasante", error: error.message });
+    res
+      .status(500)
+      .json({ msg: "Error al crear pasante", error: error.message });
   }
 };
 
@@ -124,7 +138,7 @@ const obtenerPasantes = async (req, res) => {
     const { search } = req.query;
     let filtro = {};
     if (search) {
-      const regex = new RegExp(search, 'i');
+      const regex = new RegExp(search, "i");
       filtro = { $or: [{ nombre: regex }, { email: regex }] };
     }
     const pasantes = await Pasante.find(filtro);
@@ -206,19 +220,23 @@ const crearExposicion = async (req, res) => {
       descripcion,
       imagen: {
         url: imagen.path,
-        public_id: imagen.filename
+        public_id: imagen.filename,
       },
       audio: {
         url: audio.path,
-        public_id: audio.filename
+        public_id: audio.filename,
       },
-      creadoPor: req.user?.id || '68465dcebf8e27168b67c6a1'
+      creadoPor: req.user?.id || "68465dcebf8e27168b67c6a1",
     });
 
     await nuevaExposicion.save();
-    res.status(201).json({ msg: "Exposición creada", exposicion: nuevaExposicion });
+    res
+      .status(201)
+      .json({ msg: "Exposición creada", exposicion: nuevaExposicion });
   } catch (error) {
-    res.status(500).json({ msg: "Error al crear exposición", error: error.message });
+    res
+      .status(500)
+      .json({ msg: "Error al crear exposición", error: error.message });
   }
 };
 
@@ -228,7 +246,7 @@ const obtenerExposiciones = async (req, res) => {
     const { search } = req.query;
     let filtro = {};
     if (search) {
-      const regex = new RegExp(search, 'i');
+      const regex = new RegExp(search, "i");
       filtro = { nombre: regex };
     }
     const exposiciones = await Exposicion.find(filtro);
@@ -242,7 +260,8 @@ const obtenerExposiciones = async (req, res) => {
 const obtenerExposicionPorId = async (req, res) => {
   try {
     const exposicion = await Exposicion.findById(req.params.id);
-    if (!exposicion) return res.status(404).json({ msg: "Exposición no encontrada" });
+    if (!exposicion)
+      return res.status(404).json({ msg: "Exposición no encontrada" });
     res.status(200).json(exposicion);
   } catch (error) {
     res.status(500).json({ msg: "Error al obtener exposición" });
@@ -253,7 +272,8 @@ const obtenerExposicionPorId = async (req, res) => {
 const actualizarExposicion = async (req, res) => {
   try {
     const exposicion = await Exposicion.findById(req.params.id);
-    if (!exposicion) return res.status(404).json({ msg: "Exposición no encontrada" });
+    if (!exposicion)
+      return res.status(404).json({ msg: "Exposición no encontrada" });
 
     const { nombre, descripcion } = req.body;
     exposicion.nombre = nombre || exposicion.nombre;
@@ -264,7 +284,7 @@ const actualizarExposicion = async (req, res) => {
       const nuevaImagen = req.files.imagen[0];
       exposicion.imagen = {
         url: nuevaImagen.path,
-        public_id: nuevaImagen.filename
+        public_id: nuevaImagen.filename,
       };
     }
 
@@ -273,7 +293,7 @@ const actualizarExposicion = async (req, res) => {
       const nuevoAudio = req.files.audio[0];
       exposicion.audio = {
         url: nuevoAudio.path,
-        public_id: nuevoAudio.filename
+        public_id: nuevoAudio.filename,
       };
     }
 
@@ -288,14 +308,15 @@ const actualizarExposicion = async (req, res) => {
 const eliminarExposicion = async (req, res) => {
   try {
     const exposicion = await Exposicion.findById(req.params.id);
-    if (!exposicion) return res.status(404).json({ msg: "Exposición no encontrada" });
+    if (!exposicion)
+      return res.status(404).json({ msg: "Exposición no encontrada" });
 
     if (exposicion.imagen?.public_id) {
-      await deleteFileFromCloudinary(exposicion.imagen.public_id, 'image');
+      await deleteFileFromCloudinary(exposicion.imagen.public_id, "image");
     }
 
     if (exposicion.audio?.public_id) {
-      await deleteFileFromCloudinary(exposicion.audio.public_id, 'raw');
+      await deleteFileFromCloudinary(exposicion.audio.public_id, "raw");
     }
 
     await exposicion.deleteOne();
@@ -320,5 +341,5 @@ export {
   obtenerExposiciones,
   obtenerExposicionPorId,
   actualizarExposicion,
-  eliminarExposicion
+  eliminarExposicion,
 };
