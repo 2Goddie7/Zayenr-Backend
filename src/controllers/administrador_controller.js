@@ -26,7 +26,7 @@ const loginAdministrador = async (req, res) => {
       return res.status(401).json({ msg: "Contraseña incorrecta" });
 
     const token = jwt.sign(
-      { id: admin._id, rol: admin.rol }, // ✅ AGREGA EL ROL
+      { id: admin._id, rol: admin.rol }, 
       process.env.JWT_SECRET || "secreto",
       { expiresIn: "1d" }
     );
