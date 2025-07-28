@@ -30,6 +30,4 @@ export const crearDonacion = async (req, res) => {
   }
 };
 
-export{
-    crearDonacion
-}
+export default crearDonacion
