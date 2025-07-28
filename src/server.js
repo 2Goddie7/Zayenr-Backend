@@ -7,6 +7,7 @@ import cors from "cors";
 import routerPasantes from "./routers/pasante.routes.js";
 import routerExposiciones from "./routers/exposicion.routes.js";
 import routerAdmin from "./routers/administrador.routes.js";
+import routerDonaciones from "./routers/donaciones.routes.js"
 
 const app = express();
 dotenv.config();
@@ -24,7 +25,9 @@ app.get("/", (req, res) => {
 // Rutas definidas
 app.use("/api/pasantes", routerPasantes);
 app.use("/api/exposiciones", routerExposiciones);
-app.use("/api/admin", routerAdmin); // Veremos
+app.use("/api/admin", routerAdmin); 
+app.use('/api/donaciones', routerDonaciones);
+
 
 // Middleware para rutas no encontradas
 app.use((req, res) => {

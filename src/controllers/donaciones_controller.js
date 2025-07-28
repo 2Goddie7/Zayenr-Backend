@@ -2,9 +2,21 @@ import Stripe from 'stripe';
 
 const stripe = new Stripe(process.env.STRIPE_PRIVATE_KEY);
 
+
+
 export const crearDonacion = async (req, res) => {
+
+  console.log('Body recibido:', req.body);
+  const { monto } = req.body;
+
+  if (!monto) {
+    return res.status(400).json({ error: 'Falta el monto en la petición' });
+  }
+
+  
   try {
     const session = await stripe.checkout.sessions.create({
+      
       payment_method_types: ['card'],
       line_items: [
         {
@@ -21,6 +33,7 @@ export const crearDonacion = async (req, res) => {
       mode: 'payment',
       success_url: 'http://localhost:5173/donations/success',
       cancel_url: 'http://localhost:5173/donations/cancel',
+      
     });
 
     res.json({ id: session.id });
