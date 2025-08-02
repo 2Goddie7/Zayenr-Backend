@@ -31,8 +31,8 @@ export const crearDonacion = async (req, res) => {
         },
       ],
       mode: 'payment',
-      success_url: 'http://localhost:5173/donations/success',
-      cancel_url: 'http://localhost:5173/donations/cancel',
+      success_url: 'https://zayenda.netlify.app/donations/success',
+      cancel_url: 'https://zayenda.netlify.app/donations/cancel',
       
     });
 
