@@ -7,9 +7,11 @@ async function crearAdministrador() {
 
     // Crea una instancia del modelo
     const admin = new Administrador({
-      nombre: 'DIEGO MUSEO',
-      email: 'diego.mullo@epn.edu.ec',
-      rol: 'administrador'
+      nombre: 'Prueba Admini',
+      email: 'bsl56458@toaik.com',
+      rol: 'admini',
+      facultad:'Administrativo',
+      celular:'0999999998',
     });
   
     // Cifra la contraseña usando el método del esquema

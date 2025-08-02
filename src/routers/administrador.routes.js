@@ -4,6 +4,8 @@ import {
   loginAdministrador,
   cambiarPasswordAdministrador,
   obtenerPerfilAdministrador,
+  crearAdmin,
+  eliminarAdministrador,
   crearPasante,
   obtenerPasantes,
   obtenerPasantePorId,
@@ -27,6 +29,9 @@ router.put(
   verificarTokenJWT,
   cambiarPasswordAdministrador
 );
+//Crear admin
+router.post('/crearAdministrador',verificarTokenJWT,crearAdmin);
+router.delete('/eliminarAdministrador',verificarTokenJWT,eliminarAdministrador)
 
 router.get('/perfil/:id', verificarTokenJWT, obtenerPerfilAdministrador);
 
