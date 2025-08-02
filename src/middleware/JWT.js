@@ -24,7 +24,7 @@ export const verificarTokenJWT = async (req, res, next) => {
     const token = authorization.split(" ")[1];
     const { id, rol } = jwt.verify(token, process.env.JWT_SECRET || 'secreto');
 
-    if (rol !== "administrador") {
+    if (rol !== "administrador" && rol !== "admini") {
       return res.status(403).json({ msg: "Acceso solo permitido a administradores" });
     }
 

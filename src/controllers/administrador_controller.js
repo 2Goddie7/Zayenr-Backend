@@ -16,17 +16,19 @@ const loginAdministrador = async (req, res) => {
     if (!admin)
       return res.status(404).json({ msg: "El correo no está registrado" });
 
-    if (admin.rol !== "administrador")
-      return res
-        .status(403)
-        .json({ msg: "No tienes permisos de administrador" });
+    const rolesPermitidos = ["administrador", "admini"];
+
+    if (!rolesPermitidos.includes(admin.rol)) {
+      return res.status(403).json({ msg: "No tienes permisos de administrador" });
+    }
+
 
     const passwordValida = await admin.matchPassword(password);
     if (!passwordValida)
       return res.status(401).json({ msg: "Contraseña incorrecta" });
 
     const token = jwt.sign(
-      { id: admin._id, rol: admin.rol }, 
+      { id: admin._id, rol: admin.rol },
       process.env.JWT_SECRET || "secreto",
       { expiresIn: "1d" }
     );
@@ -42,9 +44,7 @@ const loginAdministrador = async (req, res) => {
       },
     });
   } catch (error) {
-    res
-      .status(500)
-      .json({ msg: "Error al iniciar sesión", error: error.message });
+    res.status(500).json({ msg: "Error al iniciar sesión", error: error.message });
   }
 };
 
@@ -62,7 +62,8 @@ const cambiarPasswordAdministrador = async (req, res) => {
     if (!admin)
       return res.status(404).json({ msg: "Administrador no encontrado" });
 
-    if (admin.rol !== "administrador") {
+
+    if (admin.rol !== "administrador" || admin.rol !== "admini") {
       return res.status(403).json({ msg: "No autorizado" });
     }
 
@@ -95,6 +96,39 @@ const obtenerPerfilAdministrador = async (req, res) => {
     res.status(500).json({ msg: "Error al obtener perfil de administrador" });
   }
 };
+
+
+//Crear admin-rango menor
+
+const crearAdmin = async (req, res) => {
+  console.log("Administrador menor")
+
+
+  if (req.user.rol !== "administradorGeneral") {
+    return res.status(403).json({ msg: "No tienes permiso para esta acción" });
+  }
+
+  const emailExiste = await Administrador.findOne({ email });
+  if (emailExiste) {
+    return res.status(400).json({ msg: "El correo ya está registrado" });
+  }
+
+  const nuevoAdmin = new Administrador({
+    nombre,
+    email,
+    password: await Administrador.prototype.encrypPassword(password),
+    celular,
+    rol: rol || "administrador"
+  });
+
+  await nuevoAdmin.save();
+  res.status(201).json({ msg: "Administrador creado correctamente", admin: nuevoAdmin });
+}
+
+//Elimianr admi
+const eliminarAdministrador = (req, res) => {
+  console.log("Eliminar administrador")
+}
 
 // PASANTES
 
@@ -330,6 +364,9 @@ export {
   loginAdministrador,
   cambiarPasswordAdministrador,
   obtenerPerfilAdministrador,
+  eliminarAdministrador,
+  //Administrador
+  crearAdmin,
   // Pasantes
   crearPasante,
   obtenerPasantes,

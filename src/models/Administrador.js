@@ -19,8 +19,13 @@ const administradorSchema = new Schema({
   },
   rol: {
     type: String,
-    enum: ['administrador'],
+    enum: ['administrador', 'admini'],
     default: 'administrador'
+  },
+  celular: {
+        type: String,
+        required: true,
+        trim: true
   },
   token: {
     type: String,
