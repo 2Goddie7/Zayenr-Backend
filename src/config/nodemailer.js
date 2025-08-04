@@ -20,10 +20,10 @@ const sendMailToRegister = (userMail, token) => {
         subject: "Museo Gustavo Orcés - Confirmación de cuenta 🏛️",
         html: `
             <h2>Bienvenido/a al Museo Gustavo Orcés</h2>
-            <p>Estás en nuestra plataforma. Para activar tu cuenta, por favor haz clic en el siguiente enlace:</p>
+            <p>Gracias por registrarte en nuestra plataforma. Para activar tu cuenta, por favor haz clic en el siguiente enlace:</p>
             <p><a href="${process.env.URL_FRONTEND}confirmar/${token}">Confirmar mi cuenta</a></p>
             <hr>
-            <footer>El equipo del Museo Gustavo Orcés agradece tu interés en formar parte de nuestro programa de pasantes.</footer>
+            <footer>El equipo del Museo Gustavo Orcés agradece tu interés en formar parte de nuestra comunidad educativa.</footer>
         `
     }
 
