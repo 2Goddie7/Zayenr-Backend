@@ -10,7 +10,6 @@ async function crearAdministrador() {
       nombre: 'Prueba Admini',
       email: 'bsl56458@toaik.com',
       rol: 'admini',
-      facultad:'Administrativo',
       celular:'0999999998',
     });
   

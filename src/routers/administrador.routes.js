@@ -5,7 +5,9 @@ import {
   cambiarPasswordAdministrador,
   obtenerPerfilAdministrador,
   crearAdmin,
+  confirmarCuentaAdmini,
   eliminarAdministrador,
+  listarAdminis,
   crearPasante,
   obtenerPasantes,
   obtenerPasantePorId,
@@ -16,6 +18,7 @@ import {
   obtenerExposicionPorId,
   actualizarExposicion,
   eliminarExposicion,
+  confirmarPasante,
 } from "../controllers/administrador_controller.js";
 import { verificarTokenJWT } from "../middleware/JWT.js";
 
@@ -31,16 +34,19 @@ router.put(
 );
 //Crear admin
 router.post('/crearAdministrador',verificarTokenJWT,crearAdmin);
+router.get("/confirmarAdministrador/:token", confirmarCuentaAdmini);
+router.get('/adminis',verificarTokenJWT,listarAdminis)
 router.delete('/eliminarAdministrador',verificarTokenJWT,eliminarAdministrador)
 
 router.get('/perfil/:id', verificarTokenJWT, obtenerPerfilAdministrador);
 
 // Rutas PASANTES
-router.post("/pasantes", verificarTokenJWT, crearPasante);
-router.get("/pasantes", verificarTokenJWT, obtenerPasantes);
-router.get("/pasantes/:id", verificarTokenJWT, obtenerPasantePorId);
-router.put("/pasantes/:id", verificarTokenJWT, actualizarPasante);
-router.delete("/pasantes/:id", verificarTokenJWT, eliminarPasante);
+router.post("/crearPasante", verificarTokenJWT, crearPasante);
+router.get("/obtenerPasante", verificarTokenJWT, obtenerPasantes);
+router.get("/confirmarPasante/:token",verificarTokenJWT, confirmarPasante)
+router.get("/obtenerPasante/:id", verificarTokenJWT, obtenerPasantePorId);
+router.put("/actualizarPasante/:id", verificarTokenJWT, actualizarPasante);
+router.delete("/eliminarPasante/:id", verificarTokenJWT, eliminarPasante);
 
 // Rutas EXPOSICIONES
 router.post(

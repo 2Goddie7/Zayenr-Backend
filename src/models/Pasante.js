@@ -13,10 +13,6 @@ const pasanteSchema = new Schema({
         trim: true,
         unique: true
     },
-    password: {
-        type: String,
-        required: true
-    },
     facultad: {
         type: String,
         required: true,
@@ -27,10 +23,8 @@ const pasanteSchema = new Schema({
         required: true,
         trim: true
     },
-    rol: {
-        type: String,
-        enum: ['pasante', 'administrador'],
-        default: 'pasante'
+    fotoPerfil:{
+        type:String
     },
     token: {
         type: String,
@@ -44,13 +38,11 @@ const pasanteSchema = new Schema({
         type: Boolean,
         default: true
     },
-    fotoPerfil: {
-        type: String,
-        allowNull: true
-}
-
+    microsoftId: {
+    type: String
+  }
 }, {
-    timestamps: true
+  timestamps: true
 });
 
 // Método para cifrar la contraseña

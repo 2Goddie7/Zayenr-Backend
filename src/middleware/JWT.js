@@ -33,7 +33,7 @@ export const verificarTokenJWT = async (req, res, next) => {
       return res.status(404).json({ msg: "Administrador no encontrado" });
     }
 
-    req.AdministradorBDD = admin; // lo usas en controladores si necesitas info del admin
+    req.user = admin; // lo usas en controladores si necesitas info del admin
     next();
   } catch (error) {
     return res.status(401).json({ msg: "Token expirado o inválido" });

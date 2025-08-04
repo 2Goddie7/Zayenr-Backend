@@ -2,12 +2,16 @@
 import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
+import session from "express-session";
+import passport from "passport";
+import "./config/passport.js";
 
 // Rutas importadas
 import routerPasantes from "./routers/pasante.routes.js";
 import routerExposiciones from "./routers/exposicion.routes.js";
 import routerAdmin from "./routers/administrador.routes.js";
 import routerDonaciones from "./routers/donaciones.routes.js"
+import authRoutes from './routers/auth.routes.js'
 
 const app = express();
 dotenv.config();
@@ -29,6 +33,8 @@ app.use("/api/admin", routerAdmin);
 app.use('/api/donaciones', routerDonaciones);
 
 
+app.use('/', authRoutes);
+
 // Middleware para rutas no encontradas
 app.use((req, res) => {
   res.status(404).json({ msg: "Endpoint no encontrado" });
@@ -43,6 +49,17 @@ app.use((err, req, res, next) => {
   });
 });
 */
+
+app.use(session({
+  secret: 'epn2025@',
+  resave: false,
+  saveUninitialized: false
+}));
+
+app.use(passport.initialize());
+app.use(passport.session());
+
+
 
 export default app;
 

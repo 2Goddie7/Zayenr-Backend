@@ -1,5 +1,6 @@
 import Administrador from "../models/Administrador.js";
 import Pasante from "../models/Pasante.js";
+import { sendMailToRegister } from "../config/nodemailer.js"; // o el nombre real del archivo
 import Exposicion from "../models/Exposicion.js";
 import { deleteFileFromCloudinary } from "../utils/cloudinary.js";
 import jwt from "jsonwebtoken";
@@ -15,6 +16,11 @@ const loginAdministrador = async (req, res) => {
     const admin = await Administrador.findOne({ email });
     if (!admin)
       return res.status(404).json({ msg: "El correo no está registrado" });
+
+    if (!admin.confirmEmail) {
+      return res.status(403).json({ msg: "Debes confirmar tu cuenta por correo antes de iniciar sesión" });
+    }
+
 
     const rolesPermitidos = ["administrador", "admini"];
 
@@ -63,7 +69,7 @@ const cambiarPasswordAdministrador = async (req, res) => {
       return res.status(404).json({ msg: "Administrador no encontrado" });
 
 
-    if (admin.rol !== "administrador" || admin.rol !== "admini") {
+    if (admin.rol !== "administrador" && admin.rol !== "admini") {
       return res.status(403).json({ msg: "No autorizado" });
     }
 
@@ -97,22 +103,22 @@ const obtenerPerfilAdministrador = async (req, res) => {
   }
 };
 
-
 //Crear admin-rango menor
-
 const crearAdmin = async (req, res) => {
-  console.log("Administrador menor")
-
-
-  if (req.user.rol !== "administradorGeneral") {
+  if (req.user.rol !== "administrador") {
     return res.status(403).json({ msg: "No tienes permiso para esta acción" });
   }
 
+  // Extraer datos del body
+  const { nombre, email, password, celular, rol } = req.body;
+
+  // Verificar si el email ya existe
   const emailExiste = await Administrador.findOne({ email });
   if (emailExiste) {
     return res.status(400).json({ msg: "El correo ya está registrado" });
   }
 
+  // Crear nuevo administrador
   const nuevoAdmin = new Administrador({
     nombre,
     email,
@@ -121,48 +127,155 @@ const crearAdmin = async (req, res) => {
     rol: rol || "administrador"
   });
 
-  await nuevoAdmin.save();
-  res.status(201).json({ msg: "Administrador creado correctamente", admin: nuevoAdmin });
-}
+  nuevoAdmin.token = nuevoAdmin.crearToken();
 
-//Elimianr admi
-const eliminarAdministrador = (req, res) => {
-  console.log("Eliminar administrador")
-}
+  await nuevoAdmin.save();
+  sendMailToRegister(nuevoAdmin.email, nuevoAdmin.token);
+  res.status(201).json({ msg: "Registro exitoso, ahora se debe verificar el correo ", email, admin: nuevoAdmin });
+};
+
+
+//Verifricar correo
+const confirmarCuentaAdmini = async (req, res) => {
+  const { token } = req.params;
+
+  try {
+    const admin = await Administrador.findOne({ token });
+
+
+    if (!admin) {
+      return res.status(400).json({ msg: "Token inválido o cuenta ya confirmada" });
+    }
+
+    admin.confirmEmail = true;
+    admin.tokenVerificacion = null;
+    await admin.save();
+
+    res.status(200).json({ msg: "Cuenta confirmada correctamente" });
+  } catch (error) {
+    res.status(500).json({ msg: "Error al confirmar la cuenta" });
+  }
+};
+
+//Elimianr admini
+const eliminarAdministrador = async (req, res) => {
+  try {
+    if (req.user.rol !== "administrador") {
+      return res.status(403).json({ msg: "No tienes permiso para esta acción" });
+    }
+
+    const { id } = req.params;
+
+    const adminAEliminar = await Administrador.findById(id);
+    if (!adminAEliminar) {
+      return res.status(404).json({ msg: "Administrador no encontrado" });
+    }
+
+    if (adminAEliminar.rol !== "administrador" && adminAEliminar.rol !== "admini") {
+      return res.status(400).json({ msg: "Solo puedes eliminar cuentas de tipo administrador" });
+    }
+
+    if (req.user.id === id) {
+      return res.status(400).json({ msg: "No puedes eliminarte a ti mismo" });
+    }
+
+    await adminAEliminar.deleteOne();
+    return res.status(200).json({ msg: "Administrador eliminado correctamente" });
+
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ msg: "Error del servidor" });
+  }
+};
+
+//listar adminis
+const listarAdminis = async (req, res) => {
+  try {
+    // Verificamos que el usuario que consulta sea administrador
+    if (req.user.rol !== "administrador") {
+      return res.status(403).json({ msg: "No tienes permiso para ver esta información" });
+    }
+
+    const adminis = await Administrador.find({ rol: "admini" }).select("-password");
+
+    res.status(200).json(adminis);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ msg: "Error al obtener los adminis" });
+  }
+};
 
 // PASANTES
 
 // Crear pasante
 const crearPasante = async (req, res) => {
   try {
-    const { nombre, email, password, facultad, celular, rol } = req.body;
+    const { nombre, email, facultad, celular, rol } = req.body;
 
-    if (!nombre || !email || !password || !facultad || !celular) {
+    // Validar campos obligatorios
+    if (!nombre || !email || !facultad || !celular) {
       return res.status(400).json({ msg: "Todos los campos son obligatorios" });
     }
 
+    // Verificar que el email no esté registrado
     const emailExiste = await Pasante.findOne({ email });
     if (emailExiste) {
       return res.status(400).json({ msg: "El correo ya está registrado" });
     }
 
+    // Crear token para confirmación
+    const token = crypto.randomUUID(); // O tu helper crearToken()
+
+    // Crear nuevo pasante
     const nuevoPasante = new Pasante({
       nombre,
       email,
-      password: await Pasante.prototype.encrypPassword(password),
       facultad,
       celular,
       rol: rol || "pasante",
+      token,
+      confirmEmail: false
     });
 
+    // Guardar pasante
     await nuevoPasante.save();
-    res
-      .status(201)
-      .json({ msg: "Pasante creado correctamente", pasante: nuevoPasante });
+
+    // Enviar correo de confirmación
+    await sendMailToRegister(email, token);
+
+    res.status(201).json({
+      msg: "Pasante creado correctamente. Se ha enviado un correo de confirmación.",
+      pasante: nuevoPasante
+    });
   } catch (error) {
-    res
-      .status(500)
-      .json({ msg: "Error al crear pasante", error: error.message });
+    console.error(error);
+    res.status(500).json({ msg: "Error al crear pasante", error: error.message });
+  }
+};
+
+const confirmarPasante = async (req, res) => {
+  try {
+    const { token } = req.params;
+
+    // Buscar pasante por token
+    const pasante = await Pasante.findOne({ token });
+
+    if (!pasante) {
+      return res.status(404).json({ msg: "Token no válido o expirado" });
+    }
+
+    // Confirmar el email
+    pasante.confirmEmail = true;
+    pasante.token = null;
+
+    await pasante.save();
+
+    res.status(200).json({ msg: "Cuenta confirmada correctamente" });
+  } catch (error) {
+    res.status(500).json({
+      msg: "Error al confirmar cuenta",
+      error: error.message,
+    });
   }
 };
 
@@ -365,11 +478,14 @@ export {
   cambiarPasswordAdministrador,
   obtenerPerfilAdministrador,
   eliminarAdministrador,
+  listarAdminis,
   //Administrador
   crearAdmin,
+  confirmarCuentaAdmini,
   // Pasantes
   crearPasante,
   obtenerPasantes,
+  confirmarPasante,
   obtenerPasantePorId,
   actualizarPasante,
   eliminarPasante,

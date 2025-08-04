@@ -1,6 +1,5 @@
 import express from 'express'
 import {
-  registro,
   login,
   confirmarMail,
   recuperarPassword,
@@ -9,15 +8,11 @@ import {
   obtenerPerfilPasante,
   actualizarPerfilPasante
 } from '../controllers/pasante_controller.js'
-import { googleLogin } from '../controllers/pasante_controller.js';
 
 const router = express.Router()
 
 //Login del pasante
 router.post('/login', login) // OK
-
-// Registro de pasante
-router.post('/registro', registro) // OK
 
 // Confirmar email
 router.get('/confirmar/:token', confirmarMail) // OK
@@ -31,8 +26,6 @@ router.get('/recuperar-password/:token', comprobarTokenPassword) // OK
 // Crear nueva contraseña
 router.post('/recuperar-password/:token', crearNuevoPassword) // OK
 
-// Login con Google
-router.post('/google-login', googleLogin)
 
 // Obtener perfil del pasante por ID
 router.get('/perfil/:id', obtenerPerfilPasante) // OK
