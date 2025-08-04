@@ -206,7 +206,7 @@ const listarAdminis = async (req, res) => {
 };
 
 // PASANTES
-
+//Commit para hacer la documetnacion 
 // Crear pasante
 const crearPasante = async (req, res) => {
   try {
