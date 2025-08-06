@@ -3,6 +3,7 @@ import express from "express";
 import dotenv from "dotenv";
 import session from "express-session";
 import passport from "passport";
+import cors from "cors";
 import "./config/passport.js";
 
 // Rutas importadas
@@ -21,20 +22,15 @@ app.set("port", process.env.PORT || 3000);
 // ====================
 // MIDDLEWARE CORS
 // ====================
-app.use((req, res, next) => {
-  console.log(`CORS Middleware ejecutado: ${req.method} ${req.originalUrl}`);
+app.use(cors({
+  origin: "https://zayenda.netlify.app",
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+  credentials: true
+}));
 
-  res.header("Access-Control-Allow-Origin", "https://zayenda.netlify.app");
-  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-  res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
-
-  if (req.method === "OPTIONS") {
-    console.log("Respondiendo preflight (OPTIONS)");
-    return res.sendStatus(200);
-  }
-
-  next();
-});
+// Manejo explícito de preflight
+app.options("*", cors());
 
 // ====================
 // MIDDLEWARES GENERALES
