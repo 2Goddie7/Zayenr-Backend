@@ -26,12 +26,14 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
-app.use(express.json());
+// Middleware para manejar preflight (OPTIONS) explícitamente
+app.options('*', (req, res) => {
+  res.header('Access-Control-Allow-Origin', 'https://zayenda.netlify.app');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  res.sendStatus(200);
+});
 
-app.options('*', cors({
-  origin: ['https://zayenda.netlify.app'],
-  credentials: true
-}));
 
 
 app.use(session({
