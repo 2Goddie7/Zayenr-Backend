@@ -22,15 +22,20 @@ app.set("port", process.env.PORT || 3000);
 // ====================
 // MIDDLEWARE CORS
 // ====================
+const allowedOrigins = ["https://zayenda.netlify.app"];
+
 app.use(cors({
-  origin: "https://zayenda.netlify.app",
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization"],
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+  methods: "GET,POST,PUT,DELETE,OPTIONS",
+  allowedHeaders: "Content-Type, Authorization",
   credentials: true
 }));
-
-// Manejo explícito de preflight
-app.options("*", cors());
 
 // ====================
 // MIDDLEWARES GENERALES
