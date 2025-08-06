@@ -3,7 +3,7 @@ import Pasante from "../models/Pasante.js";
 import { sendMailToRegister, sendMailToRecoveryPassword } from "../config/nodemailer.js";
 import jwt from "jsonwebtoken";
 
-// Login administrador
+// Login administrador - listo
 const loginAdministrador = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -52,7 +52,7 @@ const loginAdministrador = async (req, res) => {
   }
 };
 
-// Cambiar contraseña administrador
+// Cambiar contraseña administrador - listo
 const cambiarPasswordAdministrador = async (req, res) => {
   try {
     const { actualPassword, nuevaPassword } = req.body;
@@ -80,15 +80,15 @@ const cambiarPasswordAdministrador = async (req, res) => {
   }
 };
 
+// listo
 const obtenerPerfilAdministrador = async (req, res) => {
   try {
-    const admin = req.user; // ya lo cargaste en el middleware
+    const admin = req.user;
 
     if (!admin) {
       return res.status(404).json({ msg: "Administrador no encontrado" });
     }
 
-    // Retorna solo los campos deseados (sin password, etc.)
     const { _id, nombre, email, rol } = admin;
     res.status(200).json({ _id, nombre, email, rol });
 
@@ -97,6 +97,7 @@ const obtenerPerfilAdministrador = async (req, res) => {
   }
 };
 
+//listo
 const solicitarRecuperacionPassword = async (req, res) => {
   const { email } = req.body;
 
@@ -110,7 +111,7 @@ const solicitarRecuperacionPassword = async (req, res) => {
     admin.token = token;
     await admin.save();
 
-    await sendMailToRecoveryPassword(admin.email, token); // Puedes usar otra función si necesitas un asunto diferente
+    await sendMailToRecoveryPassword(admin.email, token);
 
     res.status(200).json({ msg: "Se ha enviado un correo para recuperar tu contraseña" });
   } catch (error) {
@@ -118,6 +119,7 @@ const solicitarRecuperacionPassword = async (req, res) => {
   }
 };
 
+//listo
 const recuperarPassword = async (req, res) => {
   const { token } = req.params;
   const { nuevaPassword } = req.body;
@@ -129,7 +131,7 @@ const recuperarPassword = async (req, res) => {
     }
 
     admin.password = await admin.encrypPassword(nuevaPassword);
-    admin.token = null; // invalidar token
+    admin.token = null;
     await admin.save();
 
     res.status(200).json({ msg: "Contraseña actualizada correctamente" });
@@ -139,7 +141,7 @@ const recuperarPassword = async (req, res) => {
 };
 
 
-//Crear admin-rango menor
+//Crear admin-rango menor - listo
 const crearAdmin = async (req, res) => {
   if (req.user.rol !== "administrador") {
     return res.status(403).json({ msg: "No tienes permiso para esta acción" });
@@ -170,7 +172,7 @@ const crearAdmin = async (req, res) => {
   res.status(201).json({ msg: "Registro exitoso, ahora se debe verificar el correo ", email, admin: nuevoAdmin });
 };
 
-//Verifricar correo
+//Verifricar correo - listo
 const confirmarCuentaAdmini = async (req, res) => {
   const { token } = req.params;
 
@@ -192,7 +194,7 @@ const confirmarCuentaAdmini = async (req, res) => {
   }
 };
 
-//Elimianr admini
+//Elimianr admini - listo
 const eliminarAdministrador = async (req, res) => {
   try {
     if (req.user.rol !== "administrador") {
@@ -223,10 +225,9 @@ const eliminarAdministrador = async (req, res) => {
   }
 };
 
-//listar adminis
+//listar adminis - listo
 const listarAdminis = async (req, res) => {
   try {
-    // Verificamos que el usuario que consulta sea administrador
     if (req.user.rol !== "administrador") {
       return res.status(403).json({ msg: "No tienes permiso para ver esta información" });
     }
@@ -242,26 +243,22 @@ const listarAdminis = async (req, res) => {
 
 // PASANTES
 //Commit para hacer la documetnacion 
-// Crear pasante
+// Crear pasante - listo, hecho un cambio verificar despues
 const crearPasante = async (req, res) => {
   try {
     const { nombre, email, facultad, celular, rol } = req.body;
 
-    // Validar campos obligatorios
     if (!nombre || !email || !facultad || !celular) {
       return res.status(400).json({ msg: "Todos los campos son obligatorios" });
     }
 
-    // Verificar que el email no esté registrado
     const emailExiste = await Pasante.findOne({ email });
     if (emailExiste) {
       return res.status(400).json({ msg: "El correo ya está registrado" });
     }
 
-    // Crear token para confirmación
-    const token = crypto.randomUUID(); // O tu helper crearToken()
+    nuevoPasante.token = nuevoPasante.crearToken();
 
-    // Crear nuevo pasante
     const nuevoPasante = new Pasante({
       nombre,
       email,
@@ -272,10 +269,8 @@ const crearPasante = async (req, res) => {
       confirmEmail: false
     });
 
-    // Guardar pasante
     await nuevoPasante.save();
 
-    // Enviar correo de confirmación
     await sendMailToRegister(email, token);
 
     res.status(201).json({
@@ -288,18 +283,16 @@ const crearPasante = async (req, res) => {
   }
 };
 
+//listo
 const confirmarPasante = async (req, res) => {
   try {
     const { token } = req.params;
-
-    // Buscar pasante por token
     const pasante = await Pasante.findOne({ token });
 
     if (!pasante) {
       return res.status(404).json({ msg: "Token no válido o expirado" });
     }
 
-    // Confirmar el email
     pasante.confirmEmail = true;
     pasante.token = null;
 
@@ -314,7 +307,7 @@ const confirmarPasante = async (req, res) => {
   }
 };
 
-// Obtener todos los pasantes
+// Obtener todos los pasantes - listo
 const obtenerPasantes = async (req, res) => {
   try {
     const { search } = req.query;
@@ -330,7 +323,7 @@ const obtenerPasantes = async (req, res) => {
   }
 };
 
-// Obtener pasante por id
+// Obtener pasante por id - listo
 const obtenerPasantePorId = async (req, res) => {
   try {
     const pasante = await Pasante.findById(req.params.id);

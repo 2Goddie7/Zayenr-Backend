@@ -35,7 +35,7 @@ router.post('/crearAdministrador',verificarTokenJWT,crearAdmin);
 router.get("/confirmarAdministrador/:token", confirmarCuentaAdmini);
 router.get('/adminis',verificarTokenJWT,listarAdminis)
 router.delete('/eliminarAdministrador/:id',verificarTokenJWT,eliminarAdministrador)
-
+// ver datos admin
 router.get('/perfil/:id', verificarTokenJWT, obtenerPerfilAdministrador);
 
 // Rutas PASANTES
