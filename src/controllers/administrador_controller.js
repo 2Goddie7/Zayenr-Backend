@@ -1,8 +1,6 @@
 import Administrador from "../models/Administrador.js";
 import Pasante from "../models/Pasante.js";
-import { sendMailToRegister } from "../config/nodemailer.js"; // o el nombre real del archivo
-import Exposicion from "../models/Exposicion.js";
-import { deleteFileFromCloudinary } from "../utils/cloudinary.js";
+import { sendMailToRegister } from "../config/nodemailer.js";
 import jwt from "jsonwebtoken";
 
 // Login administrador
@@ -57,27 +55,17 @@ const loginAdministrador = async (req, res) => {
 // Cambiar contraseña administrador
 const cambiarPasswordAdministrador = async (req, res) => {
   try {
-    const { id } = req.params; // ID del admin desde la URL
     const { actualPassword, nuevaPassword } = req.body;
 
     if (!actualPassword || !nuevaPassword) {
       return res.status(400).json({ msg: "Todos los campos son obligatorios" });
     }
 
-    const admin = await Administrador.findById(id);
-    if (!admin)
-      return res.status(404).json({ msg: "Administrador no encontrado" });
-
-
-    if (admin.rol !== "administrador" && admin.rol !== "admini") {
-      return res.status(403).json({ msg: "No autorizado" });
-    }
+    const admin = req.user;
 
     const passwordValida = await admin.matchPassword(actualPassword);
     if (!passwordValida) {
-      return res
-        .status(401)
-        .json({ msg: "La contraseña actual es incorrecta" });
+      return res.status(401).json({ msg: "La contraseña actual es incorrecta" });
     }
 
     admin.password = await admin.encrypPassword(nuevaPassword);
@@ -85,23 +73,71 @@ const cambiarPasswordAdministrador = async (req, res) => {
 
     res.status(200).json({ msg: "Contraseña actualizada correctamente" });
   } catch (error) {
-    res
-      .status(500)
-      .json({ msg: "Error al cambiar la contraseña", error: error.message });
+    res.status(500).json({
+      msg: "Error al cambiar la contraseña",
+      error: error.message
+    });
   }
 };
 
 const obtenerPerfilAdministrador = async (req, res) => {
   try {
-    const { id } = req.params;
-    const admin = await Administrador.findById(id);
-    if (!admin)
+    const admin = req.user; // ya lo cargaste en el middleware
+
+    if (!admin) {
       return res.status(404).json({ msg: "Administrador no encontrado" });
-    res.status(200).json(admin);
+    }
+
+    // Retorna solo los campos deseados (sin password, etc.)
+    const { _id, nombre, email, rol } = admin;
+    res.status(200).json({ _id, nombre, email, rol });
+
   } catch (error) {
     res.status(500).json({ msg: "Error al obtener perfil de administrador" });
   }
 };
+
+const solicitarRecuperacionPassword = async (req, res) => {
+  const { email } = req.body;
+
+  try {
+    const admin = await Administrador.findOne({ email });
+    if (!admin) {
+      return res.status(404).json({ msg: "Correo no encontrado" });
+    }
+
+    const token = crypto.randomUUID();
+    admin.token = token;
+    await admin.save();
+
+    await sendMailToRegister(admin.email, token); // Puedes usar otra función si necesitas un asunto diferente
+
+    res.status(200).json({ msg: "Se ha enviado un correo con instrucciones para recuperar tu contraseña" });
+  } catch (error) {
+    res.status(500).json({ msg: "Error al solicitar recuperación", error: error.message });
+  }
+};
+
+const recuperarPassword = async (req, res) => {
+  const { token } = req.params;
+  const { nuevaPassword } = req.body;
+
+  try {
+    const admin = await Administrador.findOne({ token });
+    if (!admin) {
+      return res.status(404).json({ msg: "Token no válido o expirado" });
+    }
+
+    admin.password = await admin.encrypPassword(nuevaPassword);
+    admin.token = null; // invalidar token
+    await admin.save();
+
+    res.status(200).json({ msg: "Contraseña actualizada correctamente" });
+  } catch (error) {
+    res.status(500).json({ msg: "Error al restablecer contraseña", error: error.message });
+  }
+};
+
 
 //Crear admin-rango menor
 const crearAdmin = async (req, res) => {
@@ -124,7 +160,7 @@ const crearAdmin = async (req, res) => {
     email,
     password: await Administrador.prototype.encrypPassword(password),
     celular,
-    rol: rol || "administrador"
+    rol: rol || "admini"
   });
 
   nuevoAdmin.token = nuevoAdmin.crearToken();
@@ -133,7 +169,6 @@ const crearAdmin = async (req, res) => {
   sendMailToRegister(nuevoAdmin.email, nuevoAdmin.token);
   res.status(201).json({ msg: "Registro exitoso, ahora se debe verificar el correo ", email, admin: nuevoAdmin });
 };
-
 
 //Verifricar correo
 const confirmarCuentaAdmini = async (req, res) => {
@@ -171,8 +206,8 @@ const eliminarAdministrador = async (req, res) => {
       return res.status(404).json({ msg: "Administrador no encontrado" });
     }
 
-    if (adminAEliminar.rol !== "administrador" && adminAEliminar.rol !== "admini") {
-      return res.status(400).json({ msg: "Solo puedes eliminar cuentas de tipo administrador" });
+    if (adminAEliminar.rol !== "admini") {
+      return res.status(400).json({ msg: "Solo puedes eliminar cuentas de tipo Admini" });
     }
 
     if (req.user.id === id) {
@@ -312,13 +347,12 @@ const actualizarPasante = async (req, res) => {
     const pasante = await Pasante.findById(req.params.id);
     if (!pasante) return res.status(404).json({ msg: "Pasante no encontrado" });
 
-    const { nombre, email, password, facultad, celular, rol } = req.body;
+    const { nombre, email, password, facultad, celular } = req.body;
 
     pasante.nombre = nombre || pasante.nombre;
     pasante.email = email || pasante.email;
     pasante.facultad = facultad || pasante.facultad;
     pasante.celular = celular || pasante.celular;
-    pasante.rol = rol || pasante.rol;
 
     if (password) {
       pasante.password = await pasante.encrypPassword(password);
@@ -344,139 +378,12 @@ const eliminarPasante = async (req, res) => {
   }
 };
 
-// EXPOSICIONES
-
-// Crear exposicion
-const crearExposicion = async (req, res) => {
-  try {
-    const { nombre, descripcion } = req.body;
-
-    if (!nombre || !descripcion) {
-      return res.status(400).json({ msg: "Todos los campos son obligatorios" });
-    }
-
-    if (!req.files?.imagen || !req.files?.audio) {
-      return res.status(400).json({ msg: "Debes subir una imagen y un audio" });
-    }
-
-    const imagen = req.files.imagen[0];
-    const audio = req.files.audio[0];
-
-    const nuevaExposicion = new Exposicion({
-      nombre,
-      descripcion,
-      imagen: {
-        url: imagen.path,
-        public_id: imagen.filename,
-      },
-      audio: {
-        url: audio.path,
-        public_id: audio.filename,
-      },
-      creadoPor: req.user?.id || "68465dcebf8e27168b67c6a1",
-    });
-
-    await nuevaExposicion.save();
-    res
-      .status(201)
-      .json({ msg: "Exposición creada", exposicion: nuevaExposicion });
-  } catch (error) {
-    res
-      .status(500)
-      .json({ msg: "Error al crear exposición", error: error.message });
-  }
-};
-
-// Obtener exposiciones o buscar por nombre
-const obtenerExposiciones = async (req, res) => {
-  try {
-    const { search } = req.query;
-    let filtro = {};
-    if (search) {
-      const regex = new RegExp(search, "i");
-      filtro = { nombre: regex };
-    }
-    const exposiciones = await Exposicion.find(filtro);
-    res.status(200).json(exposiciones);
-  } catch (error) {
-    res.status(500).json({ msg: "Error al obtener exposiciones" });
-  }
-};
-
-// Obtener exposición por id
-const obtenerExposicionPorId = async (req, res) => {
-  try {
-    const exposicion = await Exposicion.findById(req.params.id);
-    if (!exposicion)
-      return res.status(404).json({ msg: "Exposición no encontrada" });
-    res.status(200).json(exposicion);
-  } catch (error) {
-    res.status(500).json({ msg: "Error al obtener exposición" });
-  }
-};
-
-// Actualizar exposición
-const actualizarExposicion = async (req, res) => {
-  try {
-    const exposicion = await Exposicion.findById(req.params.id);
-    if (!exposicion)
-      return res.status(404).json({ msg: "Exposición no encontrada" });
-
-    const { nombre, descripcion } = req.body;
-    exposicion.nombre = nombre || exposicion.nombre;
-    exposicion.descripcion = descripcion || exposicion.descripcion;
-
-    if (req.files?.imagen) {
-      await deleteFileFromCloudinary(exposicion.imagen.public_id);
-      const nuevaImagen = req.files.imagen[0];
-      exposicion.imagen = {
-        url: nuevaImagen.path,
-        public_id: nuevaImagen.filename,
-      };
-    }
-
-    if (req.files?.audio) {
-      await deleteFileFromCloudinary(exposicion.audio.public_id);
-      const nuevoAudio = req.files.audio[0];
-      exposicion.audio = {
-        url: nuevoAudio.path,
-        public_id: nuevoAudio.filename,
-      };
-    }
-
-    await exposicion.save();
-    res.status(200).json({ msg: "Exposición actualizada", exposicion });
-  } catch (error) {
-    res.status(500).json({ msg: "Error al actualizar exposición" });
-  }
-};
-
-// Eliminar exposición
-const eliminarExposicion = async (req, res) => {
-  try {
-    const exposicion = await Exposicion.findById(req.params.id);
-    if (!exposicion)
-      return res.status(404).json({ msg: "Exposición no encontrada" });
-
-    if (exposicion.imagen?.public_id) {
-      await deleteFileFromCloudinary(exposicion.imagen.public_id, "image");
-    }
-
-    if (exposicion.audio?.public_id) {
-      await deleteFileFromCloudinary(exposicion.audio.public_id, "raw");
-    }
-
-    await exposicion.deleteOne();
-    res.status(200).json({ msg: "Exposición eliminada correctamente" });
-  } catch (error) {
-    res.status(500).json({ msg: "Error al eliminar exposición" });
-  }
-};
-
 export {
   loginAdministrador,
   cambiarPasswordAdministrador,
   obtenerPerfilAdministrador,
+  solicitarRecuperacionPassword,
+  recuperarPassword,
   eliminarAdministrador,
   listarAdminis,
   //Administrador
@@ -488,11 +395,5 @@ export {
   confirmarPasante,
   obtenerPasantePorId,
   actualizarPasante,
-  eliminarPasante,
-  // Exposiciones
-  crearExposicion,
-  obtenerExposiciones,
-  obtenerExposicionPorId,
-  actualizarExposicion,
-  eliminarExposicion,
+  eliminarPasante
 };

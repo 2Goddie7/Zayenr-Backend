@@ -127,10 +127,32 @@ const eliminarExposicion = async (req, res) => {
     }
 }
 
+const obtenerExposicionPublica = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const exposicion = await Exposicion.findById(id);
+
+    if (!exposicion) {
+      return res.status(404).json({ msg: "Exposición no encontrada" });
+    }
+
+    res.status(200).json({
+      nombre: exposicion.nombre,
+      descripcion: exposicion.descripcion,
+      imagen: exposicion.imagen?.url,
+      audio: exposicion.audio?.url
+    });
+  } catch (error) {
+    res.status(500).json({ msg: "Error al obtener la exposición pública" });
+  }
+};
+
+
 export {
     crearExposicion,
     obtenerExposiciones,
     obtenerExposicion,
     actualizarExposicion,
-    eliminarExposicion
+    eliminarExposicion,
+    obtenerExposicionPublica
 };

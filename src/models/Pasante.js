@@ -45,16 +45,6 @@ const pasanteSchema = new Schema({
   timestamps: true
 });
 
-// Método para cifrar la contraseña
-pasanteSchema.methods.encrypPassword = async function (password) {
-    const salt = await bcrypt.genSalt(10);
-    return await bcrypt.hash(password, salt);
-};
-
-// Método para verificar la contraseña
-pasanteSchema.methods.matchPassword = function (password) {
-    return bcrypt.compare(password, this.password);
-};
 
 // Método para generar token
 pasanteSchema.methods.crearToken = function () {

@@ -21,6 +21,15 @@ app.set("port", process.env.PORT || 3000);
 app.use(cors());
 app.use(express.json());
 
+app.use(session({
+  secret: 'epn2025@',
+  resave: false,
+  saveUninitialized: false
+}));
+
+app.use(passport.initialize());
+app.use(passport.session());
+
 // Ruta base
 app.get("/", (req, res) => {
   res.send("Servidor del Museo Gustavo Orcés funcionando correctamente 🏛️");
@@ -49,17 +58,6 @@ app.use((err, req, res, next) => {
   });
 });
 */
-
-app.use(session({
-  secret: 'epn2025@',
-  resave: false,
-  saveUninitialized: false
-}));
-
-app.use(passport.initialize());
-app.use(passport.session());
-
-
 
 export default app;
 
