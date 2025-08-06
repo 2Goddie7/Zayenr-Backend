@@ -1,6 +1,6 @@
 import Administrador from "../models/Administrador.js";
 import Pasante from "../models/Pasante.js";
-import { sendMailToRegister } from "../config/nodemailer.js";
+import { sendMailToRegister, sendMailToRecoveryPassword } from "../config/nodemailer.js";
 import jwt from "jsonwebtoken";
 
 // Login administrador
@@ -110,9 +110,9 @@ const solicitarRecuperacionPassword = async (req, res) => {
     admin.token = token;
     await admin.save();
 
-    await sendMailToRegister(admin.email, token); // Puedes usar otra función si necesitas un asunto diferente
+    await sendMailToRecoveryPassword(admin.email, token); // Puedes usar otra función si necesitas un asunto diferente
 
-    res.status(200).json({ msg: "Se ha enviado un correo con instrucciones para recuperar tu contraseña" });
+    res.status(200).json({ msg: "Se ha enviado un correo para recuperar tu contraseña" });
   } catch (error) {
     res.status(500).json({ msg: "Error al solicitar recuperación", error: error.message });
   }

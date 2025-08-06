@@ -23,11 +23,7 @@ const router = express.Router();
 // Login administrador
 router.post("/login", loginAdministrador);
 // Cambiar contraseña
-router.put(
-  "/cambiar-password",
-  verificarTokenJWT,
-  cambiarPasswordAdministrador
-);
+router.put("/cambiar-password",verificarTokenJWT,cambiarPasswordAdministrador);
 
 //recueprar contraseña 
 router.post('/recuperarPassword', solicitarRecuperacionPassword);
