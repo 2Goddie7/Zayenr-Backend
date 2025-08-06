@@ -37,6 +37,7 @@ app.use(cors({
   credentials: true
 }));
 
+//Para el commit
 // ====================
 // MIDDLEWARES GENERALES
 // ====================
