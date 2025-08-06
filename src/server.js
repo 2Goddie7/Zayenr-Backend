@@ -46,20 +46,40 @@ app.get("/", (req, res) => {
 });
 
 // Rutas definidas con logs
-console.log("Registrando rutas: /api/pasantes");
-app.use("/api/pasantes", routerPasantes);
+try {
+  console.log("Registrando rutas: /api/pasantes");
+  app.use("/api/pasantes", routerPasantes);
+} catch (err) {
+  console.error("Error cargando router de pasantes:", err);
+}
 
-console.log("Registrando rutas: /api/exposiciones");
-app.use("/api/exposiciones", routerExposiciones);
+try {
+  console.log("Registrando rutas: /api/exposiciones");
+  app.use("/api/exposiciones", routerExposiciones);
+} catch (err) {
+  console.error("Error cargando router de exposiciones:", err);
+}
 
-console.log("Registrando rutas: /api/admin");
-app.use("/api/admin", routerAdmin);
+try {
+  console.log("Registrando rutas: /api/admin");
+  app.use("/api/admin", routerAdmin);
+} catch (err) {
+  console.error("Error cargando router de admin:", err);
+}
 
-console.log("Registrando rutas: /api/donaciones");
-app.use('/api/donaciones', routerDonaciones);
+try {
+  console.log("Registrando rutas: /api/donaciones");
+  app.use('/api/donaciones', routerDonaciones);
+} catch (err) {
+  console.error("Error cargando router de donaciones:", err);
+}
 
-console.log("Registrando rutas: / (auth)");
-app.use('/', authRoutes);
+try {
+  console.log("Registrando rutas: / (auth)");
+  app.use('/', authRoutes);
+} catch (err) {
+  console.error("Error cargando router de auth:", err);
+}
 
 // Middleware para rutas no encontradas
 console.log("Registrando middleware de rutas no encontradas");
