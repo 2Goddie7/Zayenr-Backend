@@ -20,15 +20,19 @@ dotenv.config();
 app.set("port", process.env.PORT || 3000);
 
 app.use(cors({
-  origin: 'https://zayenda.netlify.app',
+  origin: ['https://zayenda.netlify.app'],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
-app.options('*', cors());
-
 app.use(express.json());
+
+app.options('*', cors({
+  origin: ['https://zayenda.netlify.app'],
+  credentials: true
+}));
+
 
 app.use(session({
   secret: 'epn2025@',
