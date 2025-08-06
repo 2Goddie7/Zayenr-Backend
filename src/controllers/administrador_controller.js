@@ -2,6 +2,7 @@ import Administrador from "../models/Administrador.js";
 import Pasante from "../models/Pasante.js";
 import { sendMailToRegister, sendMailToRecoveryPassword } from "../config/nodemailer.js";
 import jwt from "jsonwebtoken";
+import crypto from "crypto";
 
 // Login administrador - listo
 const loginAdministrador = async (req, res) => {
@@ -257,7 +258,8 @@ const crearPasante = async (req, res) => {
       return res.status(400).json({ msg: "El correo ya está registrado" });
     }
 
-    nuevoPasante.token = nuevoPasante.crearToken();
+    // Generar token único para confirmar email
+    const token = crypto.randomBytes(20).toString("hex");
 
     const nuevoPasante = new Pasante({
       nombre,
@@ -265,12 +267,13 @@ const crearPasante = async (req, res) => {
       facultad,
       celular,
       rol: rol || "pasante",
-      token,
+      token,             // Guardamos el token en la BD
       confirmEmail: false
     });
 
     await nuevoPasante.save();
 
+    // Enviar email con el token de confirmación
     await sendMailToRegister(email, token);
 
     res.status(201).json({
@@ -287,6 +290,7 @@ const crearPasante = async (req, res) => {
 const confirmarPasante = async (req, res) => {
   try {
     const { token } = req.params;
+
     const pasante = await Pasante.findOne({ token });
 
     if (!pasante) {
@@ -294,8 +298,7 @@ const confirmarPasante = async (req, res) => {
     }
 
     pasante.confirmEmail = true;
-    pasante.token = null;
-
+    pasante.token = null; // Limpiamos el token después de confirmar
     await pasante.save();
 
     res.status(200).json({ msg: "Cuenta confirmada correctamente" });
@@ -306,6 +309,7 @@ const confirmarPasante = async (req, res) => {
     });
   }
 };
+
 
 // Obtener todos los pasantes - listo
 const obtenerPasantes = async (req, res) => {

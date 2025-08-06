@@ -2,7 +2,7 @@
 
 export const verificarRoles = (rolesPermitidos = []) => {
   return (req, res, next) => {
-    const { rol, confirmado } = req.usuario || req.pasante || {}; // depende si es admin o pasante
+    const { rol, confirmado } = req.usuario || req.pasante || {};
 
     if (!rol) {
       return res.status(401).json({ msg: 'No autenticado' });

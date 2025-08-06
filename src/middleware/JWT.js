@@ -13,7 +13,7 @@ export const crearTokenJWT = (id, rol) => {
 
 export const crearTokenPasante = (id) => {
   return jwt.sign(
-    { id, rol: "pasante" }, // 🔥 rol fijo
+    { id, rol: "pasante" },
     process.env.JWT_SECRET || "secreto",
     { expiresIn: "1d" }
   );

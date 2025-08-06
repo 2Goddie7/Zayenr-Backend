@@ -40,48 +40,22 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 // Ruta base
-console.log("Registrando ruta: GET /");
 app.get("/", (req, res) => {
   res.send("Servidor del Museo Gustavo Orcés funcionando correctamente 🏛️");
 });
 
-// Rutas definidas con logs
-try {
-  console.log("Registrando rutas: /api/pasantes");
-  app.use("/api/pasantes", routerPasantes);
-} catch (err) {
-  console.error("Error cargando router de pasantes:", err);
-}
+// Rutas definidas 
+app.use("/api/pasantes", routerPasantes);
 
-try {
-  console.log("Registrando rutas: /api/exposiciones");
-  app.use("/api/exposiciones", routerExposiciones);
-} catch (err) {
-  console.error("Error cargando router de exposiciones:", err);
-}
+app.use("/api/exposiciones", routerExposiciones);
 
-try {
-  console.log("Registrando rutas: /api/admin");
-  app.use("/api/admin", routerAdmin);
-} catch (err) {
-  console.error("Error cargando router de admin:", err);
-}
+app.use("/api/admin", routerAdmin);
 
-try {
-  console.log("Registrando rutas: /api/donaciones");
-  app.use('/api/donaciones', routerDonaciones);
-} catch (err) {
-  console.error("Error cargando router de donaciones:", err);
-}
+app.use('/api/donaciones', routerDonaciones);
 
-try {
-  console.log("Registrando rutas: / (auth)");
-  app.use('/', authRoutes);
-} catch (err) {
-  console.error("Error cargando router de auth:", err);
-}
+app.use('/api/auth', authRoutes);
 
-// Middleware para rutas no encontradas
+//Middleware para rutas no encontradas
 console.log("Registrando middleware de rutas no encontradas");
 app.use((req, res) => {
   res.status(404).json({ msg: "Endpoint no encontrado" });
