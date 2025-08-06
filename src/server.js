@@ -19,20 +19,19 @@ dotenv.config();
 // Configuraciones
 app.set("port", process.env.PORT || 3000);
 
-app.use(cors({
-  origin: ['https://zayenda.netlify.app'],
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
-}));
+// Configuración de CORS
+app.use((req, res, next) => {
+  res.header("Access-Control-Allow-Origin", "https://zayenda.netlify.app");
+  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+  res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
 
-// Middleware para manejar preflight (OPTIONS) explícitamente
-app.options('*', (req, res) => {
-  res.header('Access-Control-Allow-Origin', 'https://zayenda.netlify.app');
-  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-  res.sendStatus(200);
+  if (req.method === "OPTIONS") {
+    return res.sendStatus(200); // Responder inmediatamente a preflight
+  }
+
+  next();
 });
+
 
 
 
