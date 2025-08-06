@@ -22,20 +22,20 @@ app.set("port", process.env.PORT || 3000);
 // ====================
 // MIDDLEWARE CORS
 // ====================
-const allowedOrigins = ["https://zayenda.netlify.app"];
+const corsOptions = {
+  origin: ["http://localhost:5173", "https://zayenda.netlify.app"],
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+  credentials: true,
+};
 
-app.use(cors({
-  origin: (origin, callback) => {
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error("Not allowed by CORS"));
-    }
-  },
-  methods: "GET,POST,PUT,DELETE,OPTIONS",
-  allowedHeaders: "Content-Type, Authorization",
-  credentials: true
-}));
+app.use(cors(corsOptions));
+
+// Manejo manual de preflight (por seguridad extra)
+app.options("*", cors(corsOptions));
+
+// Middleware para parsear JSON
+app.use(express.json());
 
 //Para el commit
 // ====================
