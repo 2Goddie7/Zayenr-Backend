@@ -40,8 +40,12 @@ router.post(
 // Obtener todas (público)
 router.get('/', obtenerExposiciones)
 
+// ✅ Pública por QR
+router.get('/qr/:id', obtenerExposicionPublica)
+
 // Obtener una por ID (público)
 router.get('/:id', obtenerExposicion)
+
 
 // ✅ Actualizar exposición
 router.put(
@@ -77,7 +81,6 @@ router.delete(
   eliminarExposicion
 )
 
-// ✅ Pública por QR
-router.get('/qr/:id', obtenerExposicionPublica)
+
 
 export default router

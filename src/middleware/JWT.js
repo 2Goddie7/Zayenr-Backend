@@ -1,11 +1,20 @@
 import jwt from "jsonwebtoken";
 import Administrador from "../models/Administrador.js";
+import Pasante from "../models/Pasante.js"
 
 // generar token con id y rol
 export const crearTokenJWT = (id, rol) => {
   return jwt.sign(
     { id, rol },
     process.env.JWT_SECRET || 'secreto',
+    { expiresIn: "1d" }
+  );
+};
+
+export const crearTokenPasante = (id) => {
+  return jwt.sign(
+    { id, rol: "pasante" }, // 🔥 rol fijo
+    process.env.JWT_SECRET || "secreto",
     { expiresIn: "1d" }
   );
 };

@@ -26,10 +26,7 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
-app.options('*', cors({
-  origin: 'https://zayenda.netlify.app',
-  credentials: true
-}));
+app.options('*', cors());
 
 
 app.use(express.json());
