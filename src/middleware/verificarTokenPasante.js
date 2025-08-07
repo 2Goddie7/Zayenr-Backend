@@ -19,7 +19,7 @@ const verificarTokenPasante = async (req, res, next) => {
       return res.status(404).json({ msg: "Pasante no encontrado" });
     }
 
-    req.pasante = pasante; // queda disponible en el controlador
+    req.pasante = pasante;
     next();
   } catch (error) {
     return res.status(401).json({ msg: "Token inválido o expirado" });

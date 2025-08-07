@@ -1,4 +1,3 @@
-// exposicion.routes.js
 import express from 'express'
 import upload from '../middleware/upload.js'
 
@@ -75,6 +74,5 @@ router.delete(
   verificarRoles(['administrador', 'admini', 'pasante']),
   eliminarExposicion
 )
-
 
 export default router

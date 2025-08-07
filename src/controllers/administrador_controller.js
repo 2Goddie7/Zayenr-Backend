@@ -142,7 +142,7 @@ const recuperarPassword = async (req, res) => {
 };
 
 
-//Crear admin-rango menor - listo
+//Crear admini (rango menor) - listo
 const crearAdmin = async (req, res) => {
   if (req.user.rol !== "administrador") {
     return res.status(403).json({ msg: "No tienes permiso para esta acción" });
@@ -258,7 +258,6 @@ const crearPasante = async (req, res) => {
       return res.status(400).json({ msg: "El correo ya está registrado" });
     }
 
-    // Generar token único para confirmar email
     const token = crypto.randomBytes(20).toString("hex");
 
     const nuevoPasante = new Pasante({
@@ -267,22 +266,21 @@ const crearPasante = async (req, res) => {
       facultad,
       celular,
       rol: rol || "pasante",
-      token,             // Guardamos el token en la BD
+      token,
       confirmEmail: false
     });
 
     await nuevoPasante.save();
 
-    // Enviar email con el token de confirmación
     await sendMailToRegister(email, token);
 
     res.status(201).json({
-      msg: "Pasante creado correctamente. Se ha enviado un correo de confirmación.",
+      msg: "Pasante creado correctamente, revisa tu correo de confirmación.",
       pasante: nuevoPasante
     });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ msg: "Error al crear pasante", error: error.message });
+    res.status(500).json({ msg: "Error al crear pasante", error });
   }
 };
 
@@ -298,7 +296,7 @@ const confirmarPasante = async (req, res) => {
     }
 
     pasante.confirmEmail = true;
-    pasante.token = null; // Limpiamos el token después de confirmar
+    pasante.token = null;
     await pasante.save();
 
     res.status(200).json({ msg: "Cuenta confirmada correctamente" });
@@ -309,7 +307,6 @@ const confirmarPasante = async (req, res) => {
     });
   }
 };
-
 
 // Obtener todos los pasantes - listo
 const obtenerPasantes = async (req, res) => {

@@ -16,12 +16,12 @@ import authRoutes from './routers/auth.routes.js';
 const app = express();
 dotenv.config();
 
-// Configuraciones
+// Config
 app.set("port", process.env.PORT || 3000);
 
-// ====================
+// -------------------------------------------------------------
 // MIDDLEWARE CORS
-// ====================
+// -------------------------------------------------------------
 const corsOptions = {
   origin: ["http://localhost:5173", "https://zayenda.netlify.app"],
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
@@ -31,16 +31,14 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 
-// Manejo manual de preflight (por seguridad extra)
 app.options("*", cors(corsOptions));
 
-// Middleware para parsear JSON
 app.use(express.json());
 
 //Para el commit
-// ====================
+// -------------------------------------------------------------
 // MIDDLEWARES GENERALES
-// ====================
+// -------------------------------------------------------------
 app.use(express.json());
 
 app.use(session({
@@ -52,9 +50,9 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 
-// ====================
+// -------------------------------------------------------------
 // RUTAS
-// ====================
+// -------------------------------------------------------------
 app.get("/", (req, res) => {
   res.send("Servidor del Museo Gustavo Orcés funcionando correctamente 🏛️");
 });
@@ -65,15 +63,12 @@ app.use("/api/admin", routerAdmin);
 app.use('/api/donaciones', routerDonaciones);
 app.use('/api/auth', authRoutes);
 
-// ====================
+// -------------------------------------------------------------
 // MIDDLEWARE 404
-// ====================
+// -------------------------------------------------------------
 app.use((req, res) => {
   console.log(`404 - Endpoint no encontrado: ${req.method} ${req.originalUrl}`);
   res.status(404).json({ msg: "Endpoint no encontrado" });
 });
 
-// ====================
-// EXPORTAR APP
-// ====================
 export default app;

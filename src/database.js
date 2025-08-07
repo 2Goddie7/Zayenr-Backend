@@ -5,7 +5,7 @@ dotenv.config();
 
 mongoose.set("strictQuery", true);
 
-console.log("URI: ",process.env.MONGODB_URI_ATLAS);
+console.log("LINMK DE MONGO → ",process.env.MONGODB_URI_ATLAS);
 
 const connection = async () => {
   try {

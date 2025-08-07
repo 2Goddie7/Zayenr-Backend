@@ -2,7 +2,6 @@ import jwt from "jsonwebtoken";
 import Administrador from "../models/Administrador.js";
 import Pasante from "../models/Pasante.js"
 
-// generar token con id y rol
 export const crearTokenJWT = (id, rol) => {
   return jwt.sign(
     { id, rol },
@@ -19,7 +18,6 @@ export const crearTokenPasante = (id) => {
   );
 };
 
-// verificar token de administrador
 export const verificarTokenJWT = async (req, res, next) => {
   const { authorization } = req.headers;
 
@@ -42,7 +40,7 @@ export const verificarTokenJWT = async (req, res, next) => {
       return res.status(404).json({ msg: "Administrador no encontrado" });
     }
 
-    req.user = admin; // lo usas en controladores si necesitas info del admin
+    req.user = admin;
     next();
   } catch (error) {
     return res.status(401).json({ msg: "Token expirado o inválido" });

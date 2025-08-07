@@ -74,9 +74,8 @@ const actualizarExposicion = async (req, res) => {
         exposicion.nombre = nombre || exposicion.nombre
         exposicion.descripcion = descripcion || exposicion.descripcion
 
-        // Actualizar imagen si se envía
         if (req.files?.imagen) {
-            // Eliminar imagen anterior de Cloudinary
+
             await deleteFileFromCloudinary(exposicion.imagen.public_id)
 
             const nuevaImagen = req.files.imagen[0]
@@ -86,7 +85,6 @@ const actualizarExposicion = async (req, res) => {
             }
         }
 
-        // Actualizar audio si se envía
         if (req.files?.audio) {
             await deleteFileFromCloudinary(exposicion.audio.public_id)
 
@@ -116,7 +114,7 @@ const eliminarExposicion = async (req, res) => {
         }
 
         if (exposicion.audio?.public_id) {
-            await deleteFileFromCloudinary(exposicion.audio.public_id, 'raw') // porque es audio
+            await deleteFileFromCloudinary(exposicion.audio.public_id, 'raw')
         }
         await exposicion.deleteOne()
         res.status(200).json({ msg: "Exposición eliminada correctamente" })

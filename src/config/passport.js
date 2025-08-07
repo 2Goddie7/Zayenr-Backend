@@ -13,7 +13,7 @@ const strategy = new OIDCStrategy({
   clientSecret: process.env.MICROSOFT_CLIENT_SECRET,
   responseType: 'code',
   responseMode: 'query',
-  redirectUrl: `${backendUrl}/api/auth/microsoft/callback`, // NOTA: ahora incluye /api/auth
+  redirectUrl: `${backendUrl}/api/auth/microsoft/callback`,
   allowHttpForRedirectUrl: backendUrl.startsWith('http://'),
   scope: ['profile', 'email', 'openid'],
   passReqToCallback: false,

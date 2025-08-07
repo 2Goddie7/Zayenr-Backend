@@ -50,7 +50,7 @@ const obtenerPerfilPasante = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const pasante = await Pasante.findById(id); // Opcional: excluye contraseña y token
+    const pasante = await Pasante.findById(id);
 
     if (!pasante) {
       return res.status(404).json({ msg: "Pasante no encontrado" });

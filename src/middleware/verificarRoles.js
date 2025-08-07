@@ -1,5 +1,3 @@
-// middleware/verificarRoles.js
-
 export const verificarRoles = (rolesPermitidos = []) => {
   return (req, res, next) => {
     const { rol, confirmEmail: confirmado } = req.user || req.usuario || req.pasante || {};
@@ -20,5 +18,5 @@ export const verificarRoles = (rolesPermitidos = []) => {
     next();
   };
 
-  console.log(req.pasante || req.usuario || req.user)
+  //console.log(req.pasante || req.usuario || req.user)
 };

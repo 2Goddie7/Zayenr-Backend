@@ -8,8 +8,8 @@ async function crearAdministrador() {
     // Crea una instancia del modelo
     const admin = new Administrador({
       nombre: 'Prueba Admini',
-      email: 'bsl56458@toaik.com',
-      rol: 'admini',
+      email: 'byron.loarte@epn.edu.ec',
+      rol: 'administrador',
       celular:'0999999998',
     });
   

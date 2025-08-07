@@ -10,10 +10,8 @@ import { verificarRoles } from '../middleware/verificarRoles.js'
 
 const router = express.Router()
 
-//Login del pasante
-
 // Confirmar email
-router.get('/confirmar/:token', confirmarMail) // OK
+router.get('/confirmar/:token', confirmarMail)
 
 router.get('/perfil/:id', verificarTokenPasante, obtenerPerfilPasante);
 router.put('/perfil/:id', verificarTokenPasante, actualizarPerfilPasante);
