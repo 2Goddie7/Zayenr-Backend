@@ -2,7 +2,8 @@
 
 export const verificarRoles = (rolesPermitidos = []) => {
   return (req, res, next) => {
-    const { rol, confirmado } = req.usuario || req.pasante || {};
+    const { rol, confirmEmail: confirmado } = req.user || req.usuario || req.pasante || {};
+
 
     if (!rol) {
       return res.status(401).json({ msg: 'No autenticado' });
@@ -18,4 +19,6 @@ export const verificarRoles = (rolesPermitidos = []) => {
 
     next();
   };
+
+  console.log(req.pasante || req.usuario || req.user)
 };

@@ -17,11 +17,9 @@ import { verificarRoles } from '../middleware/verificarRoles.js'
 
 const router = express.Router()
 
-// ✅ Crear exposición: permitido a admin, admini, pasante
 router.post(
   '/crearExposicion',
   (req, res, next) => {
-    // Determina si es pasante o admin
     const token = req.headers.authorization?.split(' ')[1]
     if (token?.startsWith('pas_')) {
       verificarTokenPasante(req, res, next)
@@ -29,7 +27,7 @@ router.post(
       verificarTokenJWT(req, res, next)
     }
   },
-  verificarRoles(['admin', 'admini', 'pasante']),
+  verificarRoles(['administrador', 'admini', 'pasante']),
   upload.fields([
     { name: 'imagen', maxCount: 1 },
     { name: 'audio', maxCount: 1 }
@@ -37,17 +35,15 @@ router.post(
   crearExposicion
 )
 
-// Obtener todas (público)
+// Obtener todas
 router.get('/', obtenerExposiciones)
 
-// ✅ Pública por QR
+
 router.get('/qr/:id', obtenerExposicionPublica)
 
-// Obtener una por ID (público)
 router.get('/:id', obtenerExposicion)
 
 
-// ✅ Actualizar exposición
 router.put(
   '/:id',
   (req, res, next) => {
@@ -58,7 +54,7 @@ router.put(
       verificarTokenJWT(req, res, next)
     }
   },
-  verificarRoles(['admin', 'admini', 'pasante']),
+  verificarRoles(['administrador', 'admini', 'pasante']),
   upload.fields([
     { name: 'imagen', maxCount: 1 },
     { name: 'audio', maxCount: 1 }
@@ -66,7 +62,6 @@ router.put(
   actualizarExposicion
 )
 
-// ✅ Eliminar exposición
 router.delete(
   '/:id',
   (req, res, next) => {
@@ -77,10 +72,9 @@ router.delete(
       verificarTokenJWT(req, res, next)
     }
   },
-  verificarRoles(['admin', 'admini', 'pasante']),
+  verificarRoles(['administrador', 'admini', 'pasante']),
   eliminarExposicion
 )
-
 
 
 export default router

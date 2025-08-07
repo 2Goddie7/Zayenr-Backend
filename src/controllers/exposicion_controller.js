@@ -28,7 +28,7 @@ const crearExposicion = async (req, res) => {
                 url: audio.path,
                 public_id: audio.filename
             },
-            creadoPor: req.user?.id || '68465dcebf8e27168b67c6a1' // cambia por el ID real si es necesario
+            creadoPor: req.user?.id
         });
 
         await nuevaExposicion.save();
