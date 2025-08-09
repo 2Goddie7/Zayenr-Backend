@@ -9,6 +9,7 @@ import {
   eliminarExposicion,
   obtenerExposicionPublica
 } from '../controllers/exposicion_controller.js'
+import { validarCrearExposicion } from '../middleware/validators.js'
 
 import { verificarTokenJWT } from '../middleware/JWT.js'
 import  verificarTokenPasante  from '../middleware/verificarTokenPasante.js'
@@ -30,7 +31,7 @@ router.post(
   upload.fields([
     { name: 'imagen', maxCount: 1 },
     { name: 'audio', maxCount: 1 }
-  ]),
+  ]), validarCrearExposicion,
   crearExposicion
 )
 

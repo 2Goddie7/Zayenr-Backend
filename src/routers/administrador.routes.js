@@ -3,6 +3,7 @@ import {
   loginAdministrador,
   cambiarPasswordAdministrador,
   obtenerPerfilAdministrador,
+  actualizarFotoPerfilAdministrador,
   solicitarRecuperacionPassword,
   recuperarPassword,
   crearAdmin,
@@ -17,13 +18,18 @@ import {
   confirmarPasante,
 } from "../controllers/administrador_controller.js";
 import { verificarTokenJWT } from "../middleware/JWT.js";
+import { validarLoginAdmin, validarCrearPasante } from "../middleware/validators.js";
+import upload from '../middleware/upload.js'
 
 const router = express.Router();
 
 // Login administrador
-router.post("/login", loginAdministrador);
+router.post("/login", validarLoginAdmin, loginAdministrador);
 // Cambiar contraseña
 router.put("/cambiar-password",verificarTokenJWT,cambiarPasswordAdministrador);
+
+//cambiar foto 
+router.put('/actualizarFotoPerfil/:id', verificarTokenJWT, upload.single('foto'), actualizarFotoPerfilAdministrador);
 
 //recueprar contraseña 
 router.post('/recuperarPassword', solicitarRecuperacionPassword);
@@ -39,7 +45,7 @@ router.delete('/eliminarAdministrador/:id',verificarTokenJWT,eliminarAdministrad
 router.get('/perfil/:id', verificarTokenJWT, obtenerPerfilAdministrador);
 
 // Rutas PASANTES
-router.post("/crearPasante", verificarTokenJWT, crearPasante); // listo 
+router.post("/crearPasante", verificarTokenJWT, validarCrearPasante, crearPasante); // listo 
 router.get("/obtenerPasante", verificarTokenJWT, obtenerPasantes); // listo
 router.get("/confirmarPasante/:token", confirmarPasante) //listo
 router.get("/obtenerPasante/:id", verificarTokenJWT, obtenerPasantePorId); //listo

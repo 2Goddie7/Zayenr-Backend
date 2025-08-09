@@ -23,9 +23,13 @@ const administradorSchema = new Schema({
     default: 'administrador'
   },
   celular: {
-        type: String,
-        required: true,
-        trim: true
+    type: String,
+    required: true,
+    trim: true
+  },
+  fotoPerfil: {
+    type: String,
+    default: null
   },
   token: {
     type: String,

@@ -98,6 +98,31 @@ const obtenerPerfilAdministrador = async (req, res) => {
   }
 };
 
+//cambiarfotoperfilñ
+export const actualizarFotoPerfilAdministrador = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const admin = await Administrador.findById(id);
+    if (!admin) return res.status(404).json({ msg: "Administrador no encontrado" });
+
+    if (req.user._id.toString() !== id && req.user.rol !== 'administrador') {
+      return res.status(403).json({ msg: "No tienes permiso para actualizar esta foto" });
+    }
+
+    if (!req.file) return res.status(400).json({ msg: "No se subió ninguna imagen" });
+
+    const file = req.file;
+    admin.fotoPerfil = file.path || file.filename || file.secure_url || null;
+
+    await admin.save();
+    res.status(200).json({ msg: "Foto de perfil actualizada", admin: { id: admin._id, nombre: admin.nombre, email: admin.email, fotoPerfil: admin.fotoPerfil } });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ msg: "Error al actualizar foto", error: error.message });
+  }
+};
+
+
 //listo
 const solicitarRecuperacionPassword = async (req, res) => {
   const { email } = req.body;
@@ -170,7 +195,17 @@ const crearAdmin = async (req, res) => {
 
   await nuevoAdmin.save();
   sendMailToRegister(nuevoAdmin.email, nuevoAdmin.token);
-  res.status(201).json({ msg: "Registro exitoso, ahora se debe verificar el correo ", email, admin: nuevoAdmin });
+  res.status(201).json({
+  msg: "Registro exitoso, ahora se debe verificar el correo",
+  email,
+  admin: {
+    id: nuevoAdmin._id,
+    nombre: nuevoAdmin.nombre,
+    email: nuevoAdmin.email,
+    rol: nuevoAdmin.rol,
+    celular: nuevoAdmin.celular
+  }
+});
 };
 
 //Verifricar correo - listo
@@ -233,7 +268,7 @@ const listarAdminis = async (req, res) => {
       return res.status(403).json({ msg: "No tienes permiso para ver esta información" });
     }
 
-    const adminis = await Administrador.find({ rol: "admini" }).select("-password");
+    const adminis = await Administrador.find({ rol: "admini" }).select("-password -token");
 
     res.status(200).json(adminis);
   } catch (error) {
@@ -317,7 +352,7 @@ const obtenerPasantes = async (req, res) => {
       const regex = new RegExp(search, "i");
       filtro = { $or: [{ nombre: regex }, { email: regex }] };
     }
-    const pasantes = await Pasante.find(filtro);
+    const pasantes = await Pasante.find(filtro).select('-password -token');
     res.status(200).json(pasantes);
   } catch (error) {
     res.status(500).json({ msg: "Error al obtener pasantes" });
@@ -327,7 +362,7 @@ const obtenerPasantes = async (req, res) => {
 // Obtener pasante por id - listo
 const obtenerPasantePorId = async (req, res) => {
   try {
-    const pasante = await Pasante.findById(req.params.id);
+    const pasante = await Pasante.findById(req.params.id).select('-password -token');
     if (!pasante) return res.status(404).json({ msg: "Pasante no encontrado" });
     res.status(200).json(pasante);
   } catch (error) {

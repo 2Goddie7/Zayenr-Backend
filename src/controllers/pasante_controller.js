@@ -3,6 +3,7 @@ import { sendMailToRegister } from "../config/nodemailer.js"
 import generarJWT from '../helpers/crearJWT.js'
 
 //Actualizar foto pasante
+//Actualizar foto pasante
 const actualizarPerfilPasante = async (req, res) => {
   const { id } = req.params;
   const { nombre, email, facultad, celular, fotoPerfil } = req.body;
@@ -17,16 +18,33 @@ const actualizarPerfilPasante = async (req, res) => {
     pasante.email = email ?? pasante.email;
     pasante.facultad = facultad ?? pasante.facultad;
     pasante.celular = celular ?? pasante.celular;
-    pasante.fotoPerfil = fotoPerfil ?? pasante.fotoPerfil;
+
+    // Si se subió archivo, usar la URL de Cloudinary
+    if (req.file?.path) {
+      pasante.fotoPerfil = req.file.path;
+    } else if (fotoPerfil) {
+      pasante.fotoPerfil = fotoPerfil;
+    }
 
     await pasante.save();
 
-    res.status(200).json({ msg: "Perfil actualizado correctamente", pasante });
+    res.status(200).json({
+      msg: "Perfil actualizado correctamente",
+      pasante: {
+        id: pasante._id,
+        nombre: pasante.nombre,
+        email: pasante.email,
+        facultad: pasante.facultad,
+        celular: pasante.celular,
+        fotoPerfil: pasante.fotoPerfil
+      }
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ msg: "Error al actualizar el perfil" });
   }
 };
+
 
 // Confirmar email del pasante
 const confirmarMail = async (req, res) => {
