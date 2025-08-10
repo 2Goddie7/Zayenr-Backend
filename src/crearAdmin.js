@@ -7,14 +7,14 @@ async function crearAdministrador() {
 
     // Crea una instancia del modelo
     const admin = new Administrador({
-      nombre: 'Prueba Admini',
-      email: 'byron.loarte@epn.edu.ec',
+      nombre: 'Diego Mullo',
+      email: 'diego.mullo@epn.edu.ec',
       rol: 'administrador',
       celular:'0999999998',
     });
   
     // Cifra la contraseña usando el método del esquema
-    admin.password = await admin.encrypPassword('12345');
+    admin.password = await admin.encrypPassword('1234567');
 
     // Guarda en la base de datos
     await admin.save();
