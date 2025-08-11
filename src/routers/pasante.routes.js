@@ -24,7 +24,7 @@ router.put('/perfil/:id', verificarTokenPasante, upload.single('fotoPerfil'), ac
 router.put(
   '/admin/pasantes/:id',
   verificarTokenJWT,
-  verificarRoles(['admin', 'admini']),
+  verificarRoles(['administrador', 'admini']),
   actualizarPerfilPasante
 )
 

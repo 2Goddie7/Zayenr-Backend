@@ -20,8 +20,10 @@ const router = express.Router()
 router.post(
   '/crearExposicion',
   (req, res, next) => {
-    const token = req.headers.authorization?.split(' ')[1]
+    let token = req.headers.authorization?.split(' ')[1]
     if (token?.startsWith('pas_')) {
+      token = token.slice(4)
+      req.headers.authorization = 'Bearer ' + token
       verificarTokenPasante(req, res, next)
     } else {
       verificarTokenJWT(req, res, next)
@@ -31,9 +33,11 @@ router.post(
   upload.fields([
     { name: 'imagen', maxCount: 1 },
     { name: 'audio', maxCount: 1 }
-  ]), validarCrearExposicion,
+  ]),
+  validarCrearExposicion,
   crearExposicion
 )
+
 
 // Obtener todas
 router.get('/', obtenerExposiciones)
