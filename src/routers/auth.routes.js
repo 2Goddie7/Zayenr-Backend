@@ -30,7 +30,7 @@ router.get(
     const token = generarJWT(req.user._id);
 
     // Redirección al frontend con token
-    res.redirect(`${process.env.URL_FRONTEND}/pasante/dashboard?token=${token}`);
+    res.redirect(`${process.env.URL_FRONTEND}/dashboard?token=${token}`);
   }
 );
 
@@ -49,7 +49,7 @@ router.get(
   passport.authenticate('google', { failureRedirect: '/login', session: false }),
   (req, res) => {
     const token = generarJWT(req.user._id);
-    res.redirect(`${process.env.URL_FRONTEND}/pasante/dashboard?token=${token}`);
+    res.redirect(`${process.env.URL_FRONTEND}/dashboard?token=${token}`);
   }
 );
 
