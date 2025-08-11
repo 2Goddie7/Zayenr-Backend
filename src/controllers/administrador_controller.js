@@ -148,16 +148,16 @@ const solicitarRecuperacionPassword = async (req, res) => {
 const validarTokenRecuperacion = async (req, res) => {
   const { token } = req.params;
   try {
-    const usuario = await Usuario.findOne({ tokenRecuperacion: token });
-    if (!usuario) {
-      return res.status(404).json({ msg: 'Token inválido o expirado' });
+    const admin = await Administrador.findOne({ token });
+    if (!admin) {
+      return res.status(404).json({ msg: "Token inválido o expirado" });
     }
-    return res.json({ msg: 'Token válido' });
+    return res.json({ msg: "Token válido" });
   } catch (error) {
-    return res.status(500).json({ msg: 'Error del servidor' });
+    console.error(error);
+    return res.status(500).json({ msg: "Error del servidor", error: error.message });
   }
 };
-
 
 //listo
 const recuperarPassword = async (req, res) => {
