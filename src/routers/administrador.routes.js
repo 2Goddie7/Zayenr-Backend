@@ -5,6 +5,7 @@ import {
   obtenerPerfilAdministrador,
   actualizarFotoPerfilAdministrador,
   solicitarRecuperacionPassword,
+  validarTokenRecuperacion,
   recuperarPassword,
   crearAdmin,
   confirmarCuentaAdmini,
@@ -33,6 +34,7 @@ router.put('/actualizarFotoPerfil/:id', verificarTokenJWT, upload.single('foto')
 
 //recueprar contraseña 
 router.post('/recuperarPassword', solicitarRecuperacionPassword);
+router.get('/recuperarPassword/:token', validarTokenRecuperacion);
 router.post('/recuperarPassword/:token', recuperarPassword);
 
 
