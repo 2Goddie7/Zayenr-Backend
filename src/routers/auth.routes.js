@@ -51,6 +51,6 @@ router.get(
     const token = generarJWT(req.user._id);
     res.redirect(`${process.env.URL_FRONTEND}/dashboard?token=${token}`);
   }
-);
+);//areglo de turas 
 
 export default router;
