@@ -45,7 +45,7 @@ const sendMailToRecoveryPassword = async (userMail, token) => {
             <h2>Recuperación de Contraseña</h2>
             <p>Hemos recibido una solicitud para restablecer tu contraseña.</p>
             <p>Haz clic en el siguiente enlace para continuar:</p>
-            <a href="${process.env.URL_FRONTEND}reset/${token}">Restablecer mi contraseña</a>
+            <a href="${process.env.URL_FRONTEND}/reset/${token}">Restablecer mi contraseña</a>
             <hr>
             <footer>Si no solicitaste este cambio, ignora este mensaje. Gracias por usar la plataforma del Museo Gustavo Orcés.</footer>
         `
