@@ -49,8 +49,9 @@ router.get(
   passport.authenticate('google', { failureRedirect: '/login', session: false }),
   (req, res) => {
     const token = generarJWT(req.user._id);
-    res.redirect(`${process.env.URL_FRONTEND}/pasante/dashboard?token=${token}`);
+    const usuario = req.user;  // Aquí obtenemos todos los detalles del usuario
+    res.redirect(`${process.env.URL_FRONTEND}/pasante/dashboard?token=${token}&usuario=${JSON.stringify(usuario)}`);
   }
-);// commit para despliegue
+);
 
 export default router;
